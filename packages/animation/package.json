@@ -1,0 +1,72 @@
+{
+	"name": "@tldraw/animation",
+	"description": "Animation system for tldraw shapes using anime.js",
+	"version": "3.13.0",
+	"author": {
+		"name": "tldraw Inc.",
+		"email": "hello@tldraw.com"
+	},
+	"homepage": "https://tldraw.dev",
+	"license": "SEE LICENSE IN LICENSE.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tldraw/tldraw"
+	},
+	"bugs": {
+		"url": "https://github.com/tldraw/tldraw/issues"
+	},
+	"keywords": [
+		"tldraw",
+		"animation",
+		"anime.js",
+		"shapes",
+		"whiteboard",
+		"canvas",
+		"transitions"
+	],
+	"main": "./src/index.ts",
+	"types": "./.tsbuild/index.d.ts",
+	"files": [
+		"dist",
+		".tsbuild",
+		"src"
+	],
+	"scripts": {
+		"test-ci": "lazy inherit",
+		"test": "yarn run -T jest",
+		"test-coverage": "lazy inherit",
+		"build": "yarn run -T tsx ../../internal/scripts/build-package.ts",
+		"build-api": "yarn run -T tsx ../../internal/scripts/build-api.ts",
+		"prepack": "yarn run -T tsx ../../internal/scripts/prepack.ts",
+		"postpack": "../../internal/scripts/postpack.sh",
+		"pack-tarball": "yarn pack",
+		"lint": "yarn run -T tsx ../../internal/scripts/lint.ts"
+	},
+	"dependencies": {
+		"@tldraw/editor": "workspace:*",
+		"@tldraw/tlschema": "workspace:*",
+		"@tldraw/utils": "workspace:*",
+		"animejs": "^3.2.1"
+	},
+	"peerDependencies": {
+		"react": "^18.2.0 || ^19.0.0",
+		"react-dom": "^18.2.0 || ^19.0.0"
+	},
+	"devDependencies": {
+		"@types/animejs": "^3.1.12",
+		"@types/react": "^18.3.18",
+		"lazyrepo": "0.0.0-alpha.27",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
+	},
+	"jest": {
+		"preset": "../../internal/config/jest/node/jest-preset.js",
+		"testEnvironment": "../../../packages/utils/patchedJestJsDom.js",
+		"moduleNameMapper": {
+			"^~(.*)": "<rootDir>/src/$1"
+		},
+		"setupFilesAfterEnv": [
+			"../../internal/config/setupJest.ts"
+		]
+	}
+}
