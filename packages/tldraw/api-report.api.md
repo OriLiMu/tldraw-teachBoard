@@ -555,6 +555,9 @@ export interface CustomEmbedDefinition extends EmbedDefinition {
 }
 
 // @public (undocumented)
+export function CustomToolbarItem(): JSX_2.Element;
+
+// @public (undocumented)
 export function CutMenuItem(): JSX_2.Element;
 
 // @public (undocumented)

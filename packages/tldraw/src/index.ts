@@ -320,6 +320,7 @@ export {
 	AssetToolbarItem,
 	CheckBoxToolbarItem,
 	CloudToolbarItem,
+	CustomToolbarItem,
 	DefaultToolbarContent,
 	DiamondToolbarItem,
 	DrawToolbarItem,

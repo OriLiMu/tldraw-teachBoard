@@ -1,6 +1,8 @@
 import { GeoShapeGeoStyle, useEditor, useValue } from '@tldraw/editor'
 import { TLUiToolItem, useTools } from '../../hooks/useTools'
 import { TldrawUiMenuToolItem } from '../primitives/menus/TldrawUiMenuToolItem'
+import { TldrawUiToolbarButton } from '../primitives/TldrawUiToolbar'
+import { TldrawUiButtonIcon } from '../primitives/Button/TldrawUiButtonIcon'
 
 /** @public @react */
 export function DefaultToolbarContent() {
@@ -10,6 +12,7 @@ export function DefaultToolbarContent() {
 			<HandToolbarItem />
 			<DrawToolbarItem />
 			<EraserToolbarItem />
+			<CustomToolbarItem />
 			<ArrowToolbarItem />
 			<TextToolbarItem />
 			<NoteToolbarItem />
@@ -222,4 +225,25 @@ export function FrameToolbarItem() {
 /** @public @react */
 export function LaserToolbarItem() {
 	return <ToolbarItem tool="laser" />
+}
+
+/** @public @react */
+export function CustomToolbarItem() {
+	const editor = useEditor()
+
+	const handleClick = () => {
+		console.log('Custom button clicked!')
+		// You can add any custom functionality here
+		alert('Custom button was clicked!')
+	}
+
+	return (
+		<TldrawUiToolbarButton
+			type="tool"
+			title="Custom Button"
+			onClick={handleClick}
+		>
+			<TldrawUiButtonIcon icon="rectangle" />
+		</TldrawUiToolbarButton>
+	)
 }
