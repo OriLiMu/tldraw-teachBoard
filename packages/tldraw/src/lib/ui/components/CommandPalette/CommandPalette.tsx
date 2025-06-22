@@ -175,7 +175,7 @@ export function CommandPalette() {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         style={{
                             width: '100%',
-                            height: '55px',
+                            height: '38.5px', // 70% of 55px
                             padding: '0 1rem',
                             fontSize: '16px',
                             border: 'none',
@@ -239,22 +239,9 @@ export function CommandPalette() {
                                 <div style={{ flex: 1 }}>
                                     <div style={{
                                         fontSize: '14px',
-                                        fontWeight: '500',
-                                        marginBottom: '2px'
+                                        fontWeight: '500'
                                     }}>
                                         {command.label}
-                                    </div>
-                                    {/* 悬停时显示描述 */}
-                                    <div style={{
-                                        fontSize: '12px',
-                                        color: '#6F768F',
-                                        height: index === selectedIndex ? 'auto' : '0',
-                                        opacity: index === selectedIndex ? 1 : 0,
-                                        transform: index === selectedIndex ? 'translateY(0)' : 'translateY(-5px)',
-                                        transition: 'transform 150ms, opacity 75ms',
-                                        overflow: 'hidden'
-                                    }}>
-                                        {command.description}
                                     </div>
                                 </div>
 
@@ -315,34 +302,9 @@ export function CommandPalette() {
                     <div style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '12px', // 减小间距以适应50%高度
-                        marginLeft: '12px', // 减小左边距
+                        marginLeft: '12px',
                         flex: 1
                     }}>
-                        <span style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            whiteSpace: 'nowrap'
-                        }}>
-                            <svg style={{ width: '10px', marginRight: '2px' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                                <path d="M119.7 409.6l-112-104c-10.23-9.5-10.23-25.69 0-35.19l112-104c6.984-6.484 17.17-8.219 25.92-4.406s14.41 12.45 14.41 22L159.1 264h304V56c0-13.25 10.75-24 24-24s24 10.75 24 24V288c0 13.25-10.75 24-24 24h-328l.0015 80c0 9.547-5.656 18.19-14.41 22S126.7 416.1 119.7 409.6z" />
-                            </svg>
-                            选择
-                        </span>
-
-                        <span style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            whiteSpace: 'nowrap'
-                        }}>
-                            <svg style={{ width: '10px', marginRight: '2px' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512">
-                                <path d="M254 366.4C250.2 357.7 241.5 352 232 352H152V160h80c9.547 0 18.19-5.656 21.1-14.41c3.813-8.75 2.078-18.94-4.406-25.92l-104-112C141 2.781 134.5 .3359 128 .3359s-13.05 2.445-17.59 7.336l-104 112C-.0781 126.7-1.813 136.8 1.999 145.6C5.812 154.3 14.45 160 24 160h80v192H24c-9.547 0-18.19 5.656-22 14.41s-2.078 18.94 4.406 25.92l103.1 112c4.547 4.891 11.07 7.336 17.6 7.336s13.05-2.445 17.59-7.336l104-112C256.1 385.3 257.8 375.2 254 366.4z" />
-                            </svg>
-                            导航
-                        </span>
-
                         <span style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -352,7 +314,7 @@ export function CommandPalette() {
                             <span style={{
                                 fontFamily: 'monospace',
                                 fontWeight: '700',
-                                fontSize: '10px' // 减小字体大小以适应50%高度
+                                fontSize: '10px'
                             }}>esc</span>
                             关闭
                         </span>
