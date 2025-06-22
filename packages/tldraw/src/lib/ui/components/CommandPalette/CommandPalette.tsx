@@ -170,14 +170,14 @@ export function CommandPalette() {
                     <input
                         ref={inputRef}
                         type="text"
-                        placeholder="输入命令..."
+                        placeholder="Commands..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         style={{
                             width: '100%',
                             height: '38.5px', // 70% of 55px
                             padding: '0 1rem',
-                            fontSize: '16px',
+                            fontSize: '10px',
                             border: 'none',
                             outline: 'none',
                             backgroundColor: 'transparent',
@@ -238,7 +238,7 @@ export function CommandPalette() {
                                 {/* 命令详情 */}
                                 <div style={{ flex: 1 }}>
                                     <div style={{
-                                        fontSize: '14px',
+                                        fontSize: '12px',
                                         fontWeight: '500'
                                     }}>
                                         {command.label}
