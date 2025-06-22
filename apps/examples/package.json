@@ -45,6 +45,7 @@
 		"@tldraw/sync": "workspace:*",
 		"ag-grid-community": "^32.3.3",
 		"ag-grid-react": "^32.3.3",
+		"animejs": "^4.0.2",
 		"axe-core": "^4.10.3",
 		"classnames": "^2.5.1",
 		"lazyrepo": "0.0.0-alpha.27",

@@ -16,6 +16,7 @@ import {
 	useEditor,
 } from 'tldraw'
 import 'tldraw/tldraw.css'
+import { animate } from 'animejs'
 import { trackedShapes, useDebugging } from '../hooks/useDebugging'
 import { usePerformance } from '../hooks/usePerformance'
 import { A11yResultTable } from './a11y'
@@ -95,6 +96,39 @@ function afterChangeHandler(prev: any, next: any) {
 	}
 }
 
+function startRectangleAnimation(editor: any, rectangleId: any) {
+	// 创建一个对象来存储动画数据
+	const animationData = { x: 100 };
+
+	// 使用 anime.js 创建左右移动动画
+	const animation = animate(animationData, {
+		x: 800, // 目标位置
+		duration: 3000, // 动画持续时间 3 秒
+		ease: 'inOutQuad',
+		direction: 'alternate', // 来回移动
+		loop: true, // 无限循环
+		onUpdate: function () {
+			// 在动画更新时移动矩形
+			const rectangle = editor.getShape(rectangleId);
+			if (rectangle) {
+				editor.updateShape({
+					...rectangle,
+					x: animationData.x,
+				});
+			}
+		}
+	});
+
+	console.log('矩形动画已开始 - 使用 anime.js 从左到右移动');
+
+	// 返回停止动画的函数
+	return () => {
+		if (animation && animation.cancel) {
+			animation.cancel();
+		}
+	};
+}
+
 export default function Develop() {
 	const performanceOverrides = usePerformance()
 	const debuggingOverrides = useDebugging()
@@ -109,13 +143,15 @@ export default function Develop() {
 					; (window as any).app = editor
 						; (window as any).editor = editor
 
+					let rectangleId: any = null;
+
 					// 检查是否已经存在矩形，如果没有则创建
 					const existingShapes = editor.getCurrentPageShapes();
-					const hasRectangle = existingShapes.some(shape =>
+					const existingRectangle = existingShapes.find(shape =>
 						shape.type === 'geo' && (shape.props as any).geo === 'rectangle'
 					);
 
-					if (!hasRectangle) {
+					if (!existingRectangle) {
 						editor.createShape({
 							type: 'geo',
 							x: 100,
@@ -129,13 +165,29 @@ export default function Develop() {
 								size: 'm'
 							}
 						});
+
+						// 获取刚创建的矩形
+						const newShapes = editor.getCurrentPageShapes();
+						const newRectangle = newShapes.find(shape =>
+							shape.type === 'geo' && (shape.props as any).geo === 'rectangle'
+						);
+						rectangleId = newRectangle?.id;
 						console.log('矩形已自动创建');
 					} else {
+						rectangleId = existingRectangle.id;
 						console.log('页面已存在矩形，跳过创建');
 					}
 
 					// 调整视图以显示所有内容
 					editor.zoomToFit();
+
+					// 添加动画功能
+					if (rectangleId) {
+						// 等待一秒后开始动画
+						setTimeout(() => {
+							startRectangleAnimation(editor, rectangleId);
+						}, 1000);
+					}
 
 					const dispose = editor.store.sideEffects.registerAfterChangeHandler(
 						'shape',

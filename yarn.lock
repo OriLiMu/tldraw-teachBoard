@@ -15733,6 +15733,7 @@ __metadata:
     "@vitejs/plugin-react-swc": "npm:^3.7.2"
     ag-grid-community: "npm:^32.3.3"
     ag-grid-react: "npm:^32.3.3"
+    animejs: "npm:^4.0.2"
     axe-core: "npm:^4.10.3"
     classnames: "npm:^2.5.1"
     dotenv: "npm:^16.4.7"
