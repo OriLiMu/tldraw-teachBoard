@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useEditor } from '@tldraw/editor'
 import { Dialog as _Dialog } from 'radix-ui'
 import { GeoShapeGeoStyle } from '@tldraw/editor'
@@ -17,15 +17,16 @@ interface Command {
 }
 
 // 命令面板组件
-// 高亮匹配文本的函数
-function highlightText(text: string, query: string) {
+// 高亮匹配文本的函数 - 优化版本
+const highlightText = (text: string, query: string) => {
     if (!query.trim()) return text
 
-    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const regex = new RegExp(`(${escapedQuery})`, 'gi')
     const parts = text.split(regex)
 
     return parts.map((part, index) => {
-        if (regex.test(part)) {
+        if (part.toLowerCase() === query.toLowerCase()) {
             return (
                 <span key={index} style={{ fontWeight: 'bold', color: '#000000' }}>
                     {part}
@@ -43,8 +44,13 @@ export function CommandPalette() {
     const [selectedIndex, setSelectedIndex] = useState(0)
     const inputRef = useRef<HTMLInputElement>(null)
 
-    // 定义所有形状和常用命令
-    const commands: Command[] = [
+    // 优化输入处理
+    const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value)
+    }, [])
+
+    // 定义所有形状和常用命令 - 使用useMemo缓存
+    const commands: Command[] = useMemo(() => [
         {
             id: 'create-rectangle',
             label: '创建矩形',
@@ -192,12 +198,14 @@ export function CommandPalette() {
                 setIsOpen(false)
             }
         }
-    ]
+    ], [editor])
 
-    // 过滤命令 - 支持中英文搜索
-    const filteredCommands = commands.filter(command => {
+    // 过滤命令 - 支持中英文搜索 - 使用useMemo优化
+    const filteredCommands = useMemo(() => {
+        if (!searchQuery.trim()) return commands
+
         const query = searchQuery.toLowerCase()
-        return (
+        return commands.filter(command => (
             // 中文搜索
             command.label.toLowerCase().includes(query) ||
             command.description.toLowerCase().includes(query) ||
@@ -205,8 +213,8 @@ export function CommandPalette() {
             // 英文搜索
             command.labelEn.toLowerCase().includes(query) ||
             command.descriptionEn.toLowerCase().includes(query)
-        )
-    })
+        ))
+    }, [commands, searchQuery])
 
     // 键盘事件处理
     useEffect(() => {
@@ -292,7 +300,7 @@ export function CommandPalette() {
                         type="text"
                         placeholder="Commands..."
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={handleSearchChange}
                         style={{
                             width: '100%',
                             height: '38.5px', // 70% of 55px
