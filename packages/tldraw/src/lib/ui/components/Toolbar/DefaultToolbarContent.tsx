@@ -232,10 +232,17 @@ export function CustomToolbarItem() {
 	const editor = useEditor()
 
 	const handleClick = () => {
-		console.log('Custom button clicked! Creating rectangle via drag simulation...')
+		console.log('Custom button clicked! Clearing board and creating rectangle...')
 
 		// 创建拖拽绘制矩形的函数
 		const createRectangleByDrag = () => {
+			// 首先清空画板上的所有形状
+			const allShapeIds = Array.from(editor.getCurrentPageShapeIds())
+			if (allShapeIds.length > 0) {
+				console.log(`清空画板: 删除 ${allShapeIds.length} 个形状`)
+				editor.deleteShapes(allShapeIds)
+			}
+
 			// 设置当前工具为geo (几何形状工具)
 			editor.setCurrentTool('geo')
 
@@ -317,7 +324,7 @@ export function CustomToolbarItem() {
 	return (
 		<TldrawUiToolbarButton
 			type="tool"
-			title="拖拽创建矩形"
+			title="清空画板并创建矩形"
 			onClick={handleClick}
 		>
 			<TldrawUiButtonIcon icon="rectangle" />
