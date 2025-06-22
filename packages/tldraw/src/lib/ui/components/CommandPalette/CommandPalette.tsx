@@ -357,9 +357,9 @@ export function CommandPalette() {
                                 )}
 
                                 {/* 命令详情 */}
-                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                     <div style={{
-                                        fontSize: '12px',
+                                        fontSize: '9.6px', // 80% of 12px
                                         fontWeight: '500'
                                     }}>
                                         {highlightText(command.label, searchQuery)}
