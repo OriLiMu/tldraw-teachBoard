@@ -357,9 +357,9 @@ export function CommandPalette() {
                                 )}
 
                                 {/* 命令详情 */}
-                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center' }}>
                                     <div style={{
-                                        fontSize: '9.6px', // 80% of 12px
+                                        fontSize: '11px', // 80% of 12px
                                         fontWeight: '500'
                                     }}>
                                         {highlightText(command.label, searchQuery)}
@@ -367,7 +367,10 @@ export function CommandPalette() {
                                     <div style={{
                                         fontSize: '10px',
                                         color: '#9CA3AF',
-                                        opacity: '0.7'
+                                        opacity: '0.7',
+                                        position: 'absolute',
+                                        left: '50%',
+                                        transform: 'translateX(-50%)'
                                     }}>
                                         {highlightText(command.labelEn.toLowerCase(), searchQuery)}
                                     </div>
