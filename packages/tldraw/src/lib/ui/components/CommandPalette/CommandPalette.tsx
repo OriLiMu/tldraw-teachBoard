@@ -311,9 +311,39 @@ export function CommandPalette() {
 
     if (!isOpen) return null
 
+    const overlayStyle: React.CSSProperties = {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0, 0, 0, 0.5)',
+        backdropFilter: 'blur(4px)',
+        zIndex: 1000,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px'
+    }
+
+    const paletteStyle: React.CSSProperties = {
+        background: 'var(--color-panel)',
+        border: '1px solid var(--color-border)',
+        borderRadius: '12px',
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        width: '100%',
+        maxWidth: '640px',
+        maxHeight: '70vh',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        animation: 'command-palette-appear 0.15s ease-out',
+        position: 'relative'
+    }
+
     return (
-        <div className="tlui-command-palette-overlay">
-            <div className="tlui-command-palette">
+        <div className="tlui-command-palette-overlay" style={overlayStyle}>
+            <div className="tlui-command-palette" style={paletteStyle}>
                 <div className="tlui-command-palette-header">
                     <input
                         ref={inputRef}
@@ -322,10 +352,24 @@ export function CommandPalette() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="tlui-command-palette-input"
+                        style={{
+                            width: '100%',
+                            background: 'transparent',
+                            border: 'none',
+                            outline: 'none',
+                            fontSize: '16px',
+                            color: 'var(--color-text)',
+                            fontFamily: 'inherit',
+                            padding: '0'
+                        }}
                     />
                 </div>
 
-                <div className="tlui-command-palette-content">
+                <div className="tlui-command-palette-content" style={{
+                    flex: 1,
+                    overflowY: 'auto',
+                    padding: '8px 0'
+                }}>
                     {Object.keys(groupedCommands).length === 0 ? (
                         <div className="tlui-command-palette-empty">
                             没有找到匹配的命令
@@ -345,6 +389,14 @@ export function CommandPalette() {
                                                 setIsOpen(false)
                                             }}
                                             onMouseEnter={() => setSelectedIndex(globalIndex)}
+                                            style={{
+                                                padding: '8px 16px',
+                                                cursor: 'pointer',
+                                                borderRadius: '6px',
+                                                margin: '0 8px',
+                                                transition: 'background-color 0.1s ease',
+                                                backgroundColor: globalIndex === selectedIndex ? 'var(--color-hover)' : 'transparent'
+                                            }}
                                         >
                                             <div className="tlui-command-palette-item-content">
                                                 <div className="tlui-command-palette-item-main">
