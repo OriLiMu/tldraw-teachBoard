@@ -85,7 +85,11 @@ const router = createBrowserRouter([
 			},
 		])
 	),
-])
+], {
+	future: {
+		v7_relativeSplatPath: true,
+	},
+})
 
 function NoIndex({ children }: { children: React.ReactNode }) {
 	return (
@@ -109,7 +113,12 @@ document.addEventListener('DOMContentLoaded', () => {
 			>
 				<HelmetProvider>
 					<RootMeta />
-					<RouterProvider router={router} />
+					<RouterProvider
+						router={router}
+						future={{
+							v7_startTransition: true,
+						}}
+					/>
 				</HelmetProvider>
 			</ErrorBoundary>
 		</StrictMode>

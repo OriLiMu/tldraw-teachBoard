@@ -2,81 +2,179 @@ import { useEffect, useState } from 'react'
 import { Tldraw, useEditor, createShapeId, TLShapeId } from 'tldraw'
 import 'tldraw/tldraw.css'
 
+// 矩形配置接口
+interface RectangleConfig {
+    x?: number
+    y?: number
+    width?: number
+    height?: number
+    color?: string
+    fill?: 'none' | 'semi' | 'solid' | 'pattern'
+    label?: string
+}
+
 function AnimationControls() {
     const editor = useEditor()
     const [rectangleId, setRectangleId] = useState<TLShapeId | null>(null)
     const [isAnimating, setIsAnimating] = useState(false)
 
-    // 自动检测页面上的矩形
+    // 自动创建测试矩形
     useEffect(() => {
-        console.log('🔍 Auto-detect effect running...', { editor: !!editor, rectangleId })
+        console.log('🔍 Auto-create effect running...', { editor: !!editor, rectangleId })
 
         if (!editor || rectangleId) return
 
+        // 检查是否已有矩形
         const shapes = editor.getCurrentPageShapes()
-        console.log('📊 Found shapes for auto-detect:', shapes.length, shapes)
-
-        const rectangle = shapes.find(shape =>
+        const existingRectangle = shapes.find(shape =>
             shape.type === 'geo' &&
             'geo' in shape.props &&
             shape.props.geo === 'rectangle'
         )
 
-        console.log('🔍 Found rectangle:', rectangle)
-
-        if (rectangle) {
-            console.log('✅ Setting rectangle ID:', rectangle.id)
-            setRectangleId(rectangle.id)
+        if (existingRectangle) {
+            console.log('✅ Found existing rectangle:', existingRectangle.id)
+            setRectangleId(existingRectangle.id)
         } else {
-            console.log('❌ No rectangle found')
-        }
-    }, [editor, rectangleId])
-
-    // 创建矩形
-    const createRectangle = () => {
-        console.log('🎨 Creating rectangle manually...', { editor: !!editor })
-
-        if (!editor) {
-            console.log('❌ No editor available for manual creation')
-            return
-        }
-
-        // 创建一个红色矩形在左侧
-        const shapeId = createShapeId()
-        console.log('📦 Manual creation - Shape ID:', shapeId)
-
-        const shape = editor.createShape({
-            id: shapeId,
-            type: 'geo',
-            x: 100,
-            y: 100,
-            props: {
-                w: 800,
-                h: 600,
-                geo: 'rectangle',
+            // 自动创建默认测试矩形
+            const defaultConfig: RectangleConfig = {
+                x: 100,
+                y: 100,
+                width: 600,
+                height: 400,
                 color: 'blue',
                 fill: 'solid',
+                label: 'Test Rectangle'
+            }
+
+            const newRectangleId = createTestRectangle(defaultConfig)
+            if (newRectangleId) {
+                setRectangleId(newRectangleId)
+                console.log('🎨 Auto-created test rectangle:', newRectangleId)
+            }
+        }
+    }, [editor])
+
+    // 创建测试矩形的通用函数
+    const createTestRectangle = (config: RectangleConfig): TLShapeId | null => {
+        console.log('🎨 Creating test rectangle...', config)
+
+        if (!editor) {
+            console.log('❌ No editor available')
+            return null
+        }
+
+        const {
+            x = 100,
+            y = 100,
+            width = 600,
+            height = 400,
+            color = 'blue',
+            fill = 'solid',
+            label = 'Rectangle'
+        } = config
+
+        const shapeId = createShapeId()
+        console.log('📦 Creating shape with ID:', shapeId)
+
+        try {
+            editor.createShape({
+                id: shapeId,
+                type: 'geo',
+                x,
+                y,
+                props: {
+                    w: width,
+                    h: height,
+                    geo: 'rectangle',
+                    color,
+                    fill,
+                },
+            })
+
+            // 验证创建
+            const createdShape = editor.getShape(shapeId)
+            if (createdShape) {
+                console.log('✅ Rectangle created successfully:', {
+                    id: shapeId,
+                    size: `${width}x${height}`,
+                    position: `(${x}, ${y})`,
+                    color,
+                    fill
+                })
+
+                // 调整视图
+                editor.zoomToFit()
+                setTimeout(() => editor.zoomOut(), 100)
+
+                return shapeId
+            } else {
+                console.log('❌ Failed to create rectangle')
+                return null
+            }
+        } catch (error) {
+            console.error('❌ Error creating rectangle:', error)
+            return null
+        }
+    }
+
+    // 手动创建新矩形
+    const createNewRectangle = () => {
+        const config: RectangleConfig = {
+            x: 100,
+            y: 100,
+            width: 800,
+            height: 600,
+            color: 'blue',
+            fill: 'solid',
+            label: 'Main Test Rectangle'
+        }
+
+        const newId = createTestRectangle(config)
+        if (newId) {
+            setRectangleId(newId)
+        }
+    }
+
+    // 创建不同样式的矩形
+    const createVariantRectangle = (variant: 'small' | 'medium' | 'large') => {
+        const configs = {
+            small: {
+                x: 200,
+                y: 200,
+                width: 300,
+                height: 200,
+                color: 'red',
+                fill: 'semi' as const,
+                label: 'Small Rectangle'
             },
-        })
+            medium: {
+                x: 300,
+                y: 300,
+                width: 500,
+                height: 350,
+                color: 'green',
+                fill: 'solid' as const,
+                label: 'Medium Rectangle'
+            },
+            large: {
+                x: 50,
+                y: 50,
+                width: 900,
+                height: 700,
+                color: 'orange',
+                fill: 'pattern' as const,
+                label: 'Large Rectangle'
+            }
+        }
 
-        console.log('✅ Manual shape created:', shape)
+        const config = configs[variant]
+        const newId = createTestRectangle(config)
 
-        // 验证形状是否被创建
-        const createdShape = editor.getShape(shapeId)
-        console.log('🔍 Manual verification - Retrieved shape:', createdShape)
-        console.log('🔍 Shape props:', createdShape?.props)
-        console.log('🔍 Shape size should be: 800x600')
-
-        // 调整视图以确保矩形可见
-        editor.zoomToFit()
-        setTimeout(() => {
-            editor.zoomOut()
-        }, 100)
-
-        setRectangleId(shapeId)
-        console.log('📌 Set rectangle ID to:', shapeId)
-
-        return shapeId
+        // 如果这是第一个矩形，设置为主要矩形
+        if (newId && !rectangleId) {
+            setRectangleId(newId)
+        }
     }
 
     // 简单的动画函数 - 使用 requestAnimationFrame
@@ -202,6 +300,36 @@ function AnimationControls() {
         animateToNextPoint()
     }
 
+    // 清除所有矩形
+    const clearAllRectangles = () => {
+        if (!editor) return
+
+        const shapes = editor.getCurrentPageShapes()
+        const rectangles = shapes.filter(shape =>
+            shape.type === 'geo' &&
+            'geo' in shape.props &&
+            shape.props.geo === 'rectangle'
+        )
+
+        if (rectangles.length > 0) {
+            editor.deleteShapes(rectangles.map(r => r.id))
+            setRectangleId(null)
+            setIsAnimating(false)
+            console.log(`🗑️ Cleared ${rectangles.length} rectangles`)
+        }
+    }
+
+    // 获取当前矩形数量
+    const getRectangleCount = () => {
+        if (!editor) return 0
+        const shapes = editor.getCurrentPageShapes()
+        return shapes.filter(shape =>
+            shape.type === 'geo' &&
+            'geo' in shape.props &&
+            shape.props.geo === 'rectangle'
+        ).length
+    }
+
     return (
         <div style={{
             position: 'absolute',
@@ -213,119 +341,144 @@ function AnimationControls() {
             borderRadius: '5px',
             boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
         }}>
-            <h3>Rectangle Animation Test</h3>
+            <h3>🎯 Rectangle Animation Test</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <div style={{
                     fontSize: '14px',
-                    color: rectangleId ? '#0a5' : '#f00',
                     marginBottom: '5px',
                     fontWeight: 'bold',
-                    padding: '5px',
-                    backgroundColor: rectangleId ? '#e8f5e8' : '#ffe8e8',
-                    borderRadius: '3px'
+                    padding: '8px',
+                    backgroundColor: '#f0f8ff',
+                    borderRadius: '5px',
+                    border: '1px solid #ddd'
                 }}>
-                    Rectangle: {rectangleId ? 'Ready ✓ (Look for blue rectangle on canvas!)' : 'None found - Click "Create New Rectangle"'}
+                    📊 状态信息:
+                    <div style={{ fontSize: '12px', marginTop: '4px', fontWeight: 'normal' }}>
+                        • 画布上的矩形: {getRectangleCount()} 个
+                        <br />
+                        • 主要矩形: {rectangleId ? `✅ 已选择 (ID: ${rectangleId.slice(0, 8)}...)` : '❌ 未选择'}
+                        <br />
+                        • 动画状态: {isAnimating ? '🎬 运行中' : '⏸️ 空闲'}
+                    </div>
                 </div>
-                <button
-                    onClick={createRectangle}
-                    style={{ padding: '8px 16px', cursor: 'pointer' }}
-                >
-                    Create New Rectangle
-                </button>
-                <button
-                    onClick={() => {
-                        if (!editor) return
-                        const newShapeId = createShapeId()
-                        editor.createShape({
-                            id: newShapeId,
-                            type: 'geo',
-                            x: 300,
-                            y: 300,
-                            props: {
-                                w: 600,
-                                h: 400,
-                                geo: 'rectangle',
-                                color: 'green',
-                                fill: 'solid',
-                            },
-                        })
-                        console.log('🟢 Created second rectangle:', newShapeId)
-                        editor.zoomToFit()
-                    }}
-                    style={{ padding: '8px 16px', cursor: 'pointer', backgroundColor: '#e8f5e8' }}
-                >
-                    Create Another Rectangle (Green)
-                </button>
-                <button
-                    onClick={() => {
-                        if (!editor) return
-                        const newShapeId = createShapeId()
-                        editor.createShape({
-                            id: newShapeId,
-                            type: 'geo',
-                            x: 500,
-                            y: 150,
-                            props: {
-                                w: 400,
-                                h: 300,
-                                geo: 'rectangle',
-                                color: 'red',
-                                fill: 'semi',
-                            },
-                        })
-                        console.log('🔴 Created third rectangle:', newShapeId)
-                        editor.zoomToFit()
-                    }}
-                    style={{ padding: '8px 16px', cursor: 'pointer', backgroundColor: '#ffe8e8' }}
-                >
-                    Create Third Rectangle (Red)
-                </button>
-                <button
-                    onClick={animateLeftToRight}
-                    disabled={!rectangleId || isAnimating}
-                    style={{
-                        padding: '8px 16px',
-                        cursor: (!rectangleId || isAnimating) ? 'not-allowed' : 'pointer',
-                        opacity: (!rectangleId || isAnimating) ? 0.5 : 1
-                    }}
-                >
-                    Move Left to Right
-                </button>
-                <button
-                    onClick={animateBackAndForth}
-                    disabled={!rectangleId || isAnimating}
-                    style={{
-                        padding: '8px 16px',
-                        cursor: (!rectangleId || isAnimating) ? 'not-allowed' : 'pointer',
-                        opacity: (!rectangleId || isAnimating) ? 0.5 : 1
-                    }}
-                >
-                    Move Back and Forth
-                </button>
-                <button
-                    onClick={animateCircularPath}
-                    disabled={!rectangleId || isAnimating}
-                    style={{
-                        padding: '8px 16px',
-                        cursor: (!rectangleId || isAnimating) ? 'not-allowed' : 'pointer',
-                        opacity: (!rectangleId || isAnimating) ? 0.5 : 1
-                    }}
-                >
-                    Circular Path
-                </button>
-                <button
-                    onClick={resetPosition}
-                    disabled={!rectangleId}
-                    style={{
-                        padding: '8px 16px',
-                        cursor: !rectangleId ? 'not-allowed' : 'pointer',
-                        opacity: !rectangleId ? 0.5 : 1
-                    }}
-                >
-                    Reset Position
-                </button>
-                <div style={{ fontSize: '12px', color: '#666' }}>
-                    Status: {isAnimating ? 'Animating...' : 'Idle'}
+
+                <div style={{
+                    padding: '8px',
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: '5px',
+                    border: '1px solid #eee'
+                }}>
+                    <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                        🎨 创建矩形:
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5px' }}>
+                        <button
+                            onClick={createNewRectangle}
+                            style={{ padding: '6px 12px', cursor: 'pointer', backgroundColor: '#e8f0ff', fontSize: '12px' }}
+                        >
+                            🔵 主要矩形
+                        </button>
+                        <button
+                            onClick={() => createVariantRectangle('small')}
+                            style={{ padding: '6px 12px', cursor: 'pointer', backgroundColor: '#ffe8e8', fontSize: '12px' }}
+                        >
+                            🔴 小矩形
+                        </button>
+                        <button
+                            onClick={() => createVariantRectangle('medium')}
+                            style={{ padding: '6px 12px', cursor: 'pointer', backgroundColor: '#e8f5e8', fontSize: '12px' }}
+                        >
+                            🟢 中矩形
+                        </button>
+                        <button
+                            onClick={() => createVariantRectangle('large')}
+                            style={{ padding: '6px 12px', cursor: 'pointer', backgroundColor: '#fff3e0', fontSize: '12px' }}
+                        >
+                            🟠 大矩形
+                        </button>
+                    </div>
+                    <button
+                        onClick={clearAllRectangles}
+                        style={{
+                            padding: '6px 12px',
+                            cursor: 'pointer',
+                            backgroundColor: '#ffebee',
+                            color: '#d32f2f',
+                            marginTop: '8px',
+                            width: '100%',
+                            fontSize: '12px'
+                        }}
+                    >
+                        🗑️ 清除所有矩形
+                    </button>
+                </div>
+
+                <div style={{
+                    padding: '8px',
+                    backgroundColor: '#f0f8ff',
+                    borderRadius: '5px',
+                    border: '1px solid #ddd'
+                }}>
+                    <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                        🎬 动画控制:
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5px' }}>
+                        <button
+                            onClick={animateLeftToRight}
+                            disabled={!rectangleId || isAnimating}
+                            style={{
+                                padding: '6px 12px',
+                                cursor: (!rectangleId || isAnimating) ? 'not-allowed' : 'pointer',
+                                opacity: (!rectangleId || isAnimating) ? 0.5 : 1,
+                                fontSize: '12px',
+                                backgroundColor: '#e3f2fd'
+                            }}
+                        >
+                            ➡️ 左到右
+                        </button>
+                        <button
+                            onClick={animateBackAndForth}
+                            disabled={!rectangleId || isAnimating}
+                            style={{
+                                padding: '6px 12px',
+                                cursor: (!rectangleId || isAnimating) ? 'not-allowed' : 'pointer',
+                                opacity: (!rectangleId || isAnimating) ? 0.5 : 1,
+                                fontSize: '12px',
+                                backgroundColor: '#f3e5f5'
+                            }}
+                        >
+                            ↔️ 来回移动
+                        </button>
+                        <button
+                            onClick={animateCircularPath}
+                            disabled={!rectangleId || isAnimating}
+                            style={{
+                                padding: '6px 12px',
+                                cursor: (!rectangleId || isAnimating) ? 'not-allowed' : 'pointer',
+                                opacity: (!rectangleId || isAnimating) ? 0.5 : 1,
+                                fontSize: '12px',
+                                backgroundColor: '#e8f5e8'
+                            }}
+                        >
+                            🔄 圆形路径
+                        </button>
+                        <button
+                            onClick={resetPosition}
+                            disabled={!rectangleId}
+                            style={{
+                                padding: '6px 12px',
+                                cursor: !rectangleId ? 'not-allowed' : 'pointer',
+                                opacity: !rectangleId ? 0.5 : 1,
+                                fontSize: '12px',
+                                backgroundColor: '#fff3e0'
+                            }}
+                        >
+                            🏠 重置位置
+                        </button>
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
+                        状态: {isAnimating ? '🎬 动画中...' : '⏸️ 空闲'}
+                    </div>
                 </div>
             </div>
         </div>

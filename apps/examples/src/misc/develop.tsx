@@ -106,8 +106,37 @@ export default function Develop() {
 				overrides={[performanceOverrides, debuggingOverrides]}
 				persistenceKey="example"
 				onMount={(editor) => {
-					;(window as any).app = editor
-					;(window as any).editor = editor
+					; (window as any).app = editor
+						; (window as any).editor = editor
+
+					// 检查是否已经存在矩形，如果没有则创建
+					const existingShapes = editor.getCurrentPageShapes();
+					const hasRectangle = existingShapes.some(shape =>
+						shape.type === 'geo' && (shape.props as any).geo === 'rectangle'
+					);
+
+					if (!hasRectangle) {
+						editor.createShape({
+							type: 'geo',
+							x: 100,
+							y: 100,
+							props: {
+								w: 300,
+								h: 200,
+								geo: 'rectangle',
+								color: 'blue',
+								fill: 'solid',
+								size: 'm'
+							}
+						});
+						console.log('矩形已自动创建');
+					} else {
+						console.log('页面已存在矩形，跳过创建');
+					}
+
+					// 调整视图以显示所有内容
+					editor.zoomToFit();
+
 					const dispose = editor.store.sideEffects.registerAfterChangeHandler(
 						'shape',
 						afterChangeHandler
