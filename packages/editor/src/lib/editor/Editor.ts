@@ -7937,6 +7937,23 @@ export class Editor extends EventEmitter<TLEventMap> {
 				}
 			})
 
+			// Console log for new shape creation
+			console.log(
+				'🎨 New shapes created:',
+				shapeRecordsToCreate.map((shape) => ({
+					id: shape.id,
+					type: shape.type,
+					position: { x: shape.x, y: shape.y },
+					...(shape.props && 'w' in shape.props && 'h' in shape.props
+						? { size: { width: shape.props.w, height: shape.props.h } }
+						: {}),
+					...(shape.props && 'geo' in shape.props ? { geoType: shape.props.geo } : {}),
+					...(shape.props && 'text' in shape.props && shape.props.text
+						? { text: shape.props.text }
+						: {}),
+				}))
+			)
+
 			this.store.put(shapeRecordsToCreate)
 		})
 
