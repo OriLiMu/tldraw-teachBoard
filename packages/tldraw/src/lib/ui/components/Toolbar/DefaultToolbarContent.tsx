@@ -1,4 +1,4 @@
-import { GeoShapeGeoStyle, useEditor, useValue } from '@tldraw/editor'
+import { GeoShapeGeoStyle, useEditor, useValue, EASINGS } from '@tldraw/editor'
 import { TLUiToolItem, useTools } from '../../hooks/useTools'
 import { TldrawUiMenuToolItem } from '../primitives/menus/TldrawUiMenuToolItem'
 import { TldrawUiToolbarButton } from '../primitives/TldrawUiToolbar'
@@ -232,10 +232,10 @@ export function CustomToolbarItem() {
 	const editor = useEditor()
 
 	const handleClick = () => {
-		console.log('Custom button clicked! Clearing board and creating rectangle...')
+		console.log('Custom button clicked! Clearing board and creating animated rectangle...')
 
 		// 创建拖拽绘制矩形的函数
-		const createRectangleByDrag = () => {
+		const createAnimatedRectangle = () => {
 			// 首先清空画板上的所有形状
 			const allShapeIds = Array.from(editor.getCurrentPageShapeIds())
 			if (allShapeIds.length > 0) {
@@ -262,15 +262,15 @@ export function CustomToolbarItem() {
 				type: 'pointer',
 				target: 'canvas',
 				name: 'pointer_down',
-				point: { x: startX, y: startY, z: 0.5 },
+				point: { x: startX, y: startY },
 				pointerId: 1,
-				ctrlKey: false,
-				altKey: false,
-				shiftKey: false,
-				metaKey: false,
-				accelKey: false,
 				button: 0,
 				isPen: false,
+				shiftKey: false,
+				altKey: false,
+				ctrlKey: false,
+				metaKey: false,
+				accelKey: false,
 			})
 
 			// 短暂延迟后模拟鼠标移动
@@ -279,52 +279,114 @@ export function CustomToolbarItem() {
 					type: 'pointer',
 					target: 'canvas',
 					name: 'pointer_move',
-					point: { x: endX, y: endY, z: 0.5 },
+					point: { x: endX, y: endY },
 					pointerId: 1,
-					ctrlKey: false,
-					altKey: false,
-					shiftKey: false,
-					metaKey: false,
-					accelKey: false,
 					button: 0,
 					isPen: false,
+					shiftKey: false,
+					altKey: false,
+					ctrlKey: false,
+					metaKey: false,
+					accelKey: false,
 				})
 
-				// 再次延迟后模拟鼠标释放
+				// 再短暂延迟后模拟鼠标释放
 				setTimeout(() => {
 					editor.dispatch({
 						type: 'pointer',
 						target: 'canvas',
 						name: 'pointer_up',
-						point: { x: endX, y: endY, z: 0.5 },
+						point: { x: endX, y: endY },
 						pointerId: 1,
-						ctrlKey: false,
-						altKey: false,
-						shiftKey: false,
-						metaKey: false,
-						accelKey: false,
 						button: 0,
 						isPen: false,
+						shiftKey: false,
+						altKey: false,
+						ctrlKey: false,
+						metaKey: false,
+						accelKey: false,
 					})
 
-					console.log('矩形创建完成！')
-
 					// 切换回选择工具
+					editor.setCurrentTool('select')
+
+					// 等待矩形创建完成后开始动画
 					setTimeout(() => {
-						editor.setCurrentTool('select')
+						console.log('开始从左到右的动画...')
+						startLeftToRightAnimation()
 					}, 100)
 				}, 50)
 			}, 50)
 		}
 
-		// 执行创建矩形
-		createRectangleByDrag()
+		// 从左到右动画函数
+		const startLeftToRightAnimation = () => {
+			// 获取刚创建的矩形
+			const allShapes = Array.from(editor.getCurrentPageShapeIds())
+			if (allShapes.length === 0) {
+				console.log('没有找到要动画的形状')
+				return
+			}
+
+			const rectangleId = allShapes[allShapes.length - 1] // 最后创建的形状
+			const shape = editor.getShape(rectangleId)
+
+			if (!shape) {
+				console.log('找不到矩形形状')
+				return
+			}
+
+			console.log('找到矩形，开始动画:', shape)
+
+			// 定义动画参数
+			const startPos = { x: shape.x, y: shape.y }
+			const endPos = { x: shape.x + 400, y: shape.y } // 向右移动400像素
+			const duration = 2000 // 2秒动画
+			const startTime = Date.now()
+
+			console.log(`动画从 (${startPos.x}, ${startPos.y}) 到 (${endPos.x}, ${endPos.y})`)
+
+			// 使用requestAnimationFrame实现平滑动画
+			const animate = () => {
+				const currentTime = Date.now()
+				const elapsed = currentTime - startTime
+				const progress = Math.min(elapsed / duration, 1)
+
+				// 使用缓动函数 (easeOutCubic)
+				const easedProgress = EASINGS.easeOutCubic(progress)
+
+				// 计算当前位置
+				const currentX = startPos.x + (endPos.x - startPos.x) * easedProgress
+				const currentY = startPos.y + (endPos.y - startPos.y) * easedProgress
+
+				// 更新形状位置
+				editor.updateShape({
+					id: rectangleId,
+					type: shape.type,
+					x: currentX,
+					y: currentY,
+				})
+
+				// 继续动画或结束
+				if (progress < 1) {
+					requestAnimationFrame(animate)
+				} else {
+					console.log('动画完成！')
+				}
+			}
+
+			// 开始动画
+			requestAnimationFrame(animate)
+		}
+
+		// 执行创建和动画
+		createAnimatedRectangle()
 	}
 
 	return (
 		<TldrawUiToolbarButton
 			type="tool"
-			title="清空画板并创建矩形"
+			title="清空画板并创建动画矩形"
 			onClick={handleClick}
 		>
 			<TldrawUiButtonIcon icon="rectangle" />
