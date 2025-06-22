@@ -1941,6 +1941,9 @@
 		transform: translateX(var(--radix-toast-swipe-end-x));
 	}
 	to {
-		transform: translateX(calc(100% + var(--space-3)));
+		transform: translateX(100%);
 	}
 }
+
+/* Import CommandPalette styles */
+@import './components/CommandPalette/CommandPalette.css';
