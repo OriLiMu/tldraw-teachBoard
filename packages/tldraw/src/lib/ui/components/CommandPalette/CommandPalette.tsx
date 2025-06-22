@@ -30,7 +30,7 @@ export function CommandPalette() {
             description: '在画板上创建一个新的矩形形状',
             category: '形状',
             shortcut: 'R',
-            icon: '⬜',
+            icon: '▢',
             action: () => {
                 editor.setCurrentTool('geo')
                 editor.setStyleForNextShapes(GeoShapeGeoStyle, 'rectangle')
@@ -43,7 +43,7 @@ export function CommandPalette() {
             description: '删除画板上的所有形状和内容',
             category: '编辑',
             shortcut: 'Ctrl+A',
-            icon: '🗑️',
+            icon: '✕',
             action: () => {
                 const allShapeIds = Array.from(editor.getCurrentPageShapeIds())
                 if (allShapeIds.length > 0) {
@@ -58,7 +58,7 @@ export function CommandPalette() {
             description: '缩放画板以适应所有内容到视图中',
             category: '视图',
             shortcut: 'Shift+1',
-            icon: '🔍',
+            icon: '⌕',
             action: () => {
                 editor.zoomToFit()
                 setIsOpen(false)
@@ -149,16 +149,17 @@ export function CommandPalette() {
                 className="tlui-command-palette"
                 style={{
                     position: 'fixed',
-                    top: '50%',
+                    top: '30%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    width: '600px',
-                    maxWidth: '90vw',
+                    width: '420px', // 70% of 600px
+                    maxWidth: '70vw', // 70% of viewport width
                     borderRadius: '6px',
                     boxShadow: '0px 4px 6px 2px rgba(0, 0, 0, 0.1)',
                     zIndex: 'var(--layer-overlays)',
                     animation: 'tlui-command-palette-appear 300ms ease-out',
                     overflow: 'hidden',
+                    opacity: '0.8', // 80% transparency
                 }}
             >
                 {/* 搜索输入框 */}
@@ -189,8 +190,8 @@ export function CommandPalette() {
                 {/* 命令列表 */}
                 <div style={{
                     backgroundColor: '#ffffff',
-                    maxHeight: '165px', // 55px * 3 commands
-                    overflowY: filteredCommands.length > 3 ? 'auto' : 'hidden',
+                    maxHeight: '115px', // 减小高度以适应70%大小 (约55px * 2.1)
+                    overflowY: filteredCommands.length > 2 ? 'auto' : 'hidden',
                 }}>
                     {filteredCommands.length === 0 ? (
                         <div style={{
@@ -224,9 +225,11 @@ export function CommandPalette() {
                                 {command.icon && (
                                     <div style={{
                                         marginRight: '12px',
-                                        fontSize: '16px',
+                                        fontSize: '14px', // 减小字体大小以适应70%
                                         lineHeight: 0,
-                                        maxWidth: '18px'
+                                        maxWidth: '16px', // 减小图标宽度
+                                        fontFamily: 'system-ui, -apple-system, sans-serif', // 确保使用系统字体显示字形
+                                        fontWeight: '400'
                                     }}>
                                         {command.icon}
                                     </div>
