@@ -232,15 +232,92 @@ export function CustomToolbarItem() {
 	const editor = useEditor()
 
 	const handleClick = () => {
-		console.log('Custom button clicked!')
-		// You can add any custom functionality here
-		alert('Custom button was clicked!')
+		console.log('Custom button clicked! Creating rectangle via drag simulation...')
+
+		// 创建拖拽绘制矩形的函数
+		const createRectangleByDrag = () => {
+			// 设置当前工具为geo (几何形状工具)
+			editor.setCurrentTool('geo')
+
+			// 设置几何形状类型为矩形
+			editor.setStyleForNextShapes(GeoShapeGeoStyle, 'rectangle')
+
+			// 定义起始和结束点坐标
+			const startX = 100
+			const startY = 100
+			const endX = 300
+			const endY = 200
+
+			console.log(`模拟拖拽创建矩形: 从(${startX}, ${startY}) 到 (${endX}, ${endY})`)
+
+			// 模拟鼠标按下事件
+			editor.dispatch({
+				type: 'pointer',
+				target: 'canvas',
+				name: 'pointer_down',
+				point: { x: startX, y: startY, z: 0.5 },
+				pointerId: 1,
+				ctrlKey: false,
+				altKey: false,
+				shiftKey: false,
+				metaKey: false,
+				accelKey: false,
+				button: 0,
+				isPen: false,
+			})
+
+			// 短暂延迟后模拟鼠标移动
+			setTimeout(() => {
+				editor.dispatch({
+					type: 'pointer',
+					target: 'canvas',
+					name: 'pointer_move',
+					point: { x: endX, y: endY, z: 0.5 },
+					pointerId: 1,
+					ctrlKey: false,
+					altKey: false,
+					shiftKey: false,
+					metaKey: false,
+					accelKey: false,
+					button: 0,
+					isPen: false,
+				})
+
+				// 再次延迟后模拟鼠标释放
+				setTimeout(() => {
+					editor.dispatch({
+						type: 'pointer',
+						target: 'canvas',
+						name: 'pointer_up',
+						point: { x: endX, y: endY, z: 0.5 },
+						pointerId: 1,
+						ctrlKey: false,
+						altKey: false,
+						shiftKey: false,
+						metaKey: false,
+						accelKey: false,
+						button: 0,
+						isPen: false,
+					})
+
+					console.log('矩形创建完成！')
+
+					// 切换回选择工具
+					setTimeout(() => {
+						editor.setCurrentTool('select')
+					}, 100)
+				}, 50)
+			}, 50)
+		}
+
+		// 执行创建矩形
+		createRectangleByDrag()
 	}
 
 	return (
 		<TldrawUiToolbarButton
 			type="tool"
-			title="Custom Button"
+			title="拖拽创建矩形"
 			onClick={handleClick}
 		>
 			<TldrawUiButtonIcon icon="rectangle" />
