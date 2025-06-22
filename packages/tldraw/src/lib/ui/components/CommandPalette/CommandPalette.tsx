@@ -24,7 +24,7 @@ export function CommandPalette() {
     const [selectedIndex, setSelectedIndex] = useState(0)
     const inputRef = useRef<HTMLInputElement>(null)
 
-    // 定义3个测试命令
+    // 定义所有形状和常用命令
     const commands: Command[] = [
         {
             id: 'create-rectangle',
@@ -38,6 +38,107 @@ export function CommandPalette() {
             action: () => {
                 editor.setCurrentTool('geo')
                 editor.setStyleForNextShapes(GeoShapeGeoStyle, 'rectangle')
+                setIsOpen(false)
+            }
+        },
+        {
+            id: 'create-ellipse',
+            label: '创建椭圆',
+            labelEn: 'Create Ellipse',
+            description: '在画板上创建一个新的椭圆形状',
+            descriptionEn: 'Create a new ellipse shape on the canvas',
+            category: '形状',
+            shortcut: 'O',
+            icon: '○',
+            action: () => {
+                editor.setCurrentTool('geo')
+                editor.setStyleForNextShapes(GeoShapeGeoStyle, 'ellipse')
+                setIsOpen(false)
+            }
+        },
+        {
+            id: 'create-triangle',
+            label: '创建三角形',
+            labelEn: 'Create Triangle',
+            description: '在画板上创建一个新的三角形形状',
+            descriptionEn: 'Create a new triangle shape on the canvas',
+            category: '形状',
+            shortcut: 'T',
+            icon: '△',
+            action: () => {
+                editor.setCurrentTool('geo')
+                editor.setStyleForNextShapes(GeoShapeGeoStyle, 'triangle')
+                setIsOpen(false)
+            }
+        },
+        {
+            id: 'create-diamond',
+            label: '创建菱形',
+            labelEn: 'Create Diamond',
+            description: '在画板上创建一个新的菱形形状',
+            descriptionEn: 'Create a new diamond shape on the canvas',
+            category: '形状',
+            shortcut: 'D',
+            icon: '◆',
+            action: () => {
+                editor.setCurrentTool('geo')
+                editor.setStyleForNextShapes(GeoShapeGeoStyle, 'diamond')
+                setIsOpen(false)
+            }
+        },
+        {
+            id: 'create-arrow',
+            label: '创建箭头',
+            labelEn: 'Create Arrow',
+            description: '在画板上创建一个新的箭头',
+            descriptionEn: 'Create a new arrow on the canvas',
+            category: '形状',
+            shortcut: 'A',
+            icon: '→',
+            action: () => {
+                editor.setCurrentTool('arrow')
+                setIsOpen(false)
+            }
+        },
+        {
+            id: 'create-line',
+            label: '创建直线',
+            labelEn: 'Create Line',
+            description: '在画板上创建一个新的直线',
+            descriptionEn: 'Create a new line on the canvas',
+            category: '形状',
+            shortcut: 'L',
+            icon: '—',
+            action: () => {
+                editor.setCurrentTool('line')
+                setIsOpen(false)
+            }
+        },
+        {
+            id: 'create-draw',
+            label: '自由绘制',
+            labelEn: 'Free Draw',
+            description: '使用画笔自由绘制',
+            descriptionEn: 'Draw freely with the pen tool',
+            category: '绘制',
+            shortcut: 'P',
+            icon: '✏',
+            action: () => {
+                editor.setCurrentTool('draw')
+                setIsOpen(false)
+            }
+        },
+        {
+            id: 'create-text',
+            label: '创建文本',
+            labelEn: 'Create Text',
+            description: '在画板上添加文本',
+            descriptionEn: 'Add text to the canvas',
+            category: '文本',
+            shortcut: 'X',
+            icon: 'T',
+            action: () => {
+                editor.setCurrentTool('text')
                 setIsOpen(false)
             }
         },
@@ -182,7 +283,8 @@ export function CommandPalette() {
                             outline: 'none',
                             backgroundColor: 'transparent',
                             color: '#ffffff',
-                            fontFamily: 'inherit'
+                            fontFamily: 'inherit',
+                            cursor: 'text'
                         }}
                     />
                 </div>
@@ -190,15 +292,15 @@ export function CommandPalette() {
                 {/* 命令列表 */}
                 <div style={{
                     backgroundColor: '#ffffff',
-                    maxHeight: '80px', // 调整为适应新的行高 (约38.5px * 2.1)
-                    overflowY: filteredCommands.length > 2 ? 'auto' : 'hidden',
+                    maxHeight: '154px', // 调整为显示4个选项 (38.5px * 4)
+                    overflowY: filteredCommands.length > 4 ? 'auto' : 'hidden',
                 }}>
                     {filteredCommands.length === 0 ? (
                         <div style={{
                             padding: '20px',
                             textAlign: 'center',
                             color: '#6F768F',
-                            fontSize: '14px',
+                            fontSize: '10px',
                             fontVariant: 'all-small-caps',
                             letterSpacing: '-0.015em'
                         }}>
@@ -241,7 +343,7 @@ export function CommandPalette() {
                                         fontSize: '12px',
                                         fontWeight: '500'
                                     }}>
-                                        {command.label}
+                                        {command.label}({command.labelEn.toLowerCase()})
                                     </div>
                                 </div>
 
@@ -249,7 +351,7 @@ export function CommandPalette() {
                                 <div style={{ textAlign: 'right' }}>
                                     {command.shortcut && (
                                         <span style={{
-                                            fontSize: '12px',
+                                            fontSize: '8px',
                                             color: '#6F768F',
                                             backgroundColor: '#efefef',
                                             border: '1px solid #d1d5dc',
