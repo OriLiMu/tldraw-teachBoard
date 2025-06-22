@@ -214,9 +214,9 @@ const TldrawUiContent = React.memo(function TldrawUI() {
 			{VideoToolbar && <VideoToolbar />}
 			{Toasts && <Toasts />}
 			{Dialogs && <Dialogs />}
+			<CommandPalette />
 			<FollowingIndicator />
 			{CursorChatBubble && <CursorChatBubble />}
-			<CommandPalette />
 		</div>
 	)
 })

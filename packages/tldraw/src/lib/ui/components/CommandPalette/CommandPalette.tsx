@@ -1,429 +1,261 @@
-import { GeoShapeGeoStyle, useEditor } from '@tldraw/editor'
-import React from 'react'
-import { useMenuClipboardEvents } from '../../hooks/useClipboardEvents'
+import React, { useState, useEffect, useRef } from 'react'
+import { useEditor } from '@tldraw/editor'
+import { Dialog as _Dialog } from 'radix-ui'
+import { GeoShapeGeoStyle } from '@tldraw/editor'
 
-// 命令面板相关的类型定义
-interface CommandPaletteCommand {
+// 命令类型定义
+interface Command {
     id: string
     label: string
-    description?: string
+    description: string
     category: string
-    kbd?: string
-    icon?: string
+    shortcut?: string
     action: () => void
 }
 
 // 命令面板组件
-/** @public @react */
 export function CommandPalette() {
     const editor = useEditor()
-    const { copy, paste } = useMenuClipboardEvents()
-    const [isOpen, setIsOpen] = React.useState(false)
-    const [searchQuery, setSearchQuery] = React.useState('')
-    const [selectedIndex, setSelectedIndex] = React.useState(0)
-    const inputRef = React.useRef<HTMLInputElement>(null)
+    const [isOpen, setIsOpen] = useState(false)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [selectedIndex, setSelectedIndex] = useState(0)
+    const inputRef = useRef<HTMLInputElement>(null)
 
-    // 定义所有可用的命令
-    const commands: CommandPaletteCommand[] = React.useMemo(() => [
-        // 工具命令
+    // 定义3个测试命令
+    const commands: Command[] = [
         {
-            id: 'select-tool',
-            label: '选择工具',
-            description: '切换到选择工具',
-            category: '工具',
-            kbd: 'V',
-            action: () => editor.setCurrentTool('select')
-        },
-        {
-            id: 'draw-tool',
-            label: '绘画工具',
-            description: '切换到绘画工具',
-            category: '工具',
-            kbd: 'D',
-            action: () => editor.setCurrentTool('draw')
-        },
-        {
-            id: 'rectangle-tool',
-            label: '矩形工具',
-            description: '切换到矩形工具',
-            category: '工具',
-            kbd: 'R',
+            id: 'create-rectangle',
+            label: '创建矩形',
+            description: '在画板上创建一个新的矩形',
+            category: '形状',
+            shortcut: 'R',
             action: () => {
                 editor.setCurrentTool('geo')
                 editor.setStyleForNextShapes(GeoShapeGeoStyle, 'rectangle')
+                setIsOpen(false)
             }
         },
         {
-            id: 'ellipse-tool',
-            label: '椭圆工具',
-            description: '切换到椭圆工具',
-            category: '工具',
-            kbd: 'O',
-            action: () => {
-                editor.setCurrentTool('geo')
-                editor.setStyleForNextShapes(GeoShapeGeoStyle, 'ellipse')
-            }
-        },
-        {
-            id: 'arrow-tool',
-            label: '箭头工具',
-            description: '切换到箭头工具',
-            category: '工具',
-            kbd: 'A',
-            action: () => editor.setCurrentTool('arrow')
-        },
-        {
-            id: 'text-tool',
-            label: '文本工具',
-            description: '切换到文本工具',
-            category: '工具',
-            kbd: 'T',
-            action: () => editor.setCurrentTool('text')
-        },
-        {
-            id: 'eraser-tool',
-            label: '橡皮擦工具',
-            description: '切换到橡皮擦工具',
-            category: '工具',
-            kbd: 'E',
-            action: () => editor.setCurrentTool('eraser')
-        },
-        {
-            id: 'hand-tool',
-            label: '手形工具',
-            description: '切换到手形工具',
-            category: '工具',
-            kbd: 'H',
-            action: () => editor.setCurrentTool('hand')
-        },
-
-        // 编辑命令
-        {
-            id: 'undo',
-            label: '撤销',
-            description: '撤销上一个操作',
-            category: '编辑',
-            kbd: 'Ctrl+Z',
-            action: () => editor.undo()
-        },
-        {
-            id: 'redo',
-            label: '重做',
-            description: '重做上一个操作',
-            category: '编辑',
-            kbd: 'Ctrl+Y',
-            action: () => editor.redo()
-        },
-        {
-            id: 'copy',
-            label: '复制',
-            description: '复制选中的形状',
-            category: '编辑',
-            kbd: 'Ctrl+C',
-            action: () => copy('menu')
-        },
-        {
-            id: 'paste',
-            label: '粘贴',
-            description: '粘贴剪贴板中的内容',
-            category: '编辑',
-            kbd: 'Ctrl+V',
-            action: () => {
-                navigator.clipboard?.read().then((clipboardItems) => {
-                    paste(clipboardItems, 'menu')
-                }).catch(() => {
-                    console.log('粘贴失败')
-                })
-            }
-        },
-        {
-            id: 'select-all',
-            label: '全选',
-            description: '选择画板上的所有形状',
-            category: '编辑',
-            kbd: 'Ctrl+A',
-            action: () => editor.selectAll()
-        },
-        {
-            id: 'delete',
-            label: '删除',
-            description: '删除选中的形状',
-            category: '编辑',
-            kbd: 'Delete',
-            action: () => editor.deleteShapes(editor.getSelectedShapeIds())
-        },
-        {
-            id: 'duplicate',
-            label: '复制',
-            description: '复制选中的形状',
-            category: '编辑',
-            kbd: 'Ctrl+D',
-            action: () => editor.duplicateShapes(editor.getSelectedShapeIds())
-        },
-
-        // 视图命令
-        {
-            id: 'zoom-in',
-            label: '放大',
-            description: '放大视图',
-            category: '视图',
-            kbd: 'Ctrl+=',
-            action: () => editor.zoomIn()
-        },
-        {
-            id: 'zoom-out',
-            label: '缩小',
-            description: '缩小视图',
-            category: '视图',
-            kbd: 'Ctrl+-',
-            action: () => editor.zoomOut()
-        },
-        {
-            id: 'zoom-to-fit',
-            label: '适应窗口',
-            description: '缩放以适应所有内容',
-            category: '视图',
-            kbd: 'Shift+1',
-            action: () => editor.zoomToFit()
-        },
-        {
-            id: 'zoom-to-selection',
-            label: '缩放到选择',
-            description: '缩放以适应选中的形状',
-            category: '视图',
-            kbd: 'Shift+2',
-            action: () => editor.zoomToSelection()
-        },
-        {
-            id: 'reset-zoom',
-            label: '重置缩放',
-            description: '将缩放重置为100%',
-            category: '视图',
-            kbd: 'Shift+0',
-            action: () => editor.resetZoom()
-        },
-
-        // 自定义命令
-        {
-            id: 'clear-board',
+            id: 'clear-canvas',
             label: '清空画板',
             description: '删除画板上的所有形状',
-            category: '自定义',
+            category: '编辑',
+            shortcut: 'Ctrl+A, Del',
             action: () => {
                 const allShapeIds = Array.from(editor.getCurrentPageShapeIds())
                 if (allShapeIds.length > 0) {
                     editor.deleteShapes(allShapeIds)
                 }
+                setIsOpen(false)
             }
         },
         {
-            id: 'create-animated-rectangle',
-            label: '创建动画矩形',
-            description: '清空画板并创建一个带动画的矩形',
-            category: '自定义',
+            id: 'zoom-fit',
+            label: '适应窗口',
+            description: '缩放画板以适应所有内容',
+            category: '视图',
+            shortcut: 'Shift+1',
             action: () => {
-                // 触发自定义按钮的功能
-                const customButton = document.querySelector('[title="清空画板并创建动画矩形"]') as HTMLButtonElement
-                if (customButton) {
-                    customButton.click()
-                }
+                editor.zoomToFit()
+                setIsOpen(false)
             }
         }
-    ], [editor, copy, paste])
+    ]
 
     // 过滤命令
-    const filteredCommands = React.useMemo(() => {
-        if (!searchQuery.trim()) return commands
-
-        const query = searchQuery.toLowerCase()
-        return commands.filter(command =>
-            command.label.toLowerCase().includes(query) ||
-            command.description?.toLowerCase().includes(query) ||
-            command.category.toLowerCase().includes(query)
-        )
-    }, [commands, searchQuery])
-
-    // 按类别分组
-    const groupedCommands = React.useMemo(() => {
-        const groups: Record<string, CommandPaletteCommand[]> = {}
-        filteredCommands.forEach(command => {
-            if (!groups[command.category]) {
-                groups[command.category] = []
-            }
-            groups[command.category].push(command)
-        })
-        return groups
-    }, [filteredCommands])
+    const filteredCommands = commands.filter(command =>
+        command.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        command.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        command.category.toLowerCase().includes(searchQuery.toLowerCase())
+    )
 
     // 键盘事件处理
-    React.useEffect(() => {
+    useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             // Ctrl+K 或 Cmd+K 打开命令面板
-            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            if (e.key === 'k' && (e.ctrlKey || e.metaKey)) {
                 e.preventDefault()
                 setIsOpen(true)
                 setSearchQuery('')
                 setSelectedIndex(0)
-                return
             }
 
-            // Escape 关闭命令面板
-            if (e.key === 'Escape' && isOpen) {
-                e.preventDefault()
+            // ESC 关闭命令面板
+            if (e.key === 'Escape') {
                 setIsOpen(false)
-                return
             }
 
-            // 在命令面板打开时的导航
+            // 当命令面板打开时的键盘导航
             if (isOpen) {
-                if (e.key === 'ArrowDown' || (e.key === 'Tab' && !e.shiftKey)) {
+                if (e.key === 'ArrowDown') {
                     e.preventDefault()
                     setSelectedIndex(prev => Math.min(prev + 1, filteredCommands.length - 1))
-                } else if (e.key === 'ArrowUp' || (e.key === 'Tab' && e.shiftKey)) {
+                } else if (e.key === 'ArrowUp') {
                     e.preventDefault()
                     setSelectedIndex(prev => Math.max(prev - 1, 0))
+                } else if (e.key === 'Tab') {
+                    e.preventDefault()
+                    setSelectedIndex(prev => (prev + 1) % filteredCommands.length)
                 } else if (e.key === 'Enter') {
                     e.preventDefault()
-                    const selectedCommand = filteredCommands[selectedIndex]
-                    if (selectedCommand) {
-                        selectedCommand.action()
-                        setIsOpen(false)
+                    if (filteredCommands[selectedIndex]) {
+                        filteredCommands[selectedIndex].action()
                     }
                 }
             }
         }
 
-        document.addEventListener('keydown', handleKeyDown)
-        return () => document.removeEventListener('keydown', handleKeyDown)
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
     }, [isOpen, filteredCommands, selectedIndex])
 
     // 自动聚焦输入框
-    React.useEffect(() => {
+    useEffect(() => {
         if (isOpen && inputRef.current) {
             inputRef.current.focus()
         }
     }, [isOpen])
 
-    // 重置选中索引当搜索结果改变时
-    React.useEffect(() => {
+    // 重置选中索引当搜索改变时
+    useEffect(() => {
         setSelectedIndex(0)
     }, [searchQuery])
 
     if (!isOpen) return null
 
-    const overlayStyle: React.CSSProperties = {
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(0, 0, 0, 0.5)',
-        backdropFilter: 'blur(4px)',
-        zIndex: 1000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '20px'
-    }
-
-    const paletteStyle: React.CSSProperties = {
-        background: 'var(--color-panel)',
-        border: '1px solid var(--color-border)',
-        borderRadius: '12px',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-        width: '100%',
-        maxWidth: '640px',
-        maxHeight: '70vh',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        animation: 'command-palette-appear 0.15s ease-out',
-        position: 'relative'
-    }
-
     return (
-        <div className="tlui-command-palette-overlay" style={overlayStyle}>
-            <div className="tlui-command-palette" style={paletteStyle}>
-                <div className="tlui-command-palette-header">
-                    <input
-                        ref={inputRef}
-                        type="text"
-                        placeholder="搜索命令... (输入命令名称、描述或类别)"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="tlui-command-palette-input"
-                        style={{
-                            width: '100%',
-                            background: 'transparent',
-                            border: 'none',
-                            outline: 'none',
-                            fontSize: '16px',
-                            color: 'var(--color-text)',
-                            fontFamily: 'inherit',
-                            padding: '0'
-                        }}
-                    />
-                </div>
+        <_Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
+            <_Dialog.Portal>
+                <_Dialog.Overlay className="tlui-dialog__overlay" />
+                <_Dialog.Content
+                    className="tlui-command-palette"
+                    style={{
+                        position: 'fixed',
+                        top: '20%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: '600px',
+                        maxWidth: '90vw',
+                        backgroundColor: 'var(--color-panel)',
+                        borderRadius: 'var(--radius-3)',
+                        boxShadow: 'var(--shadow-3)',
+                        border: '1px solid var(--color-muted-1)',
+                        zIndex: 'var(--layer-overlays)',
+                    }}
+                >
+                    {/* 搜索输入框 */}
+                    <div style={{
+                        padding: '16px',
+                        borderBottom: '1px solid var(--color-muted-1)'
+                    }}>
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            placeholder="输入命令或搜索..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{
+                                width: '100%',
+                                padding: '12px',
+                                fontSize: '16px',
+                                border: 'none',
+                                outline: 'none',
+                                backgroundColor: 'transparent',
+                                color: 'var(--color-text)',
+                                fontFamily: 'inherit'
+                            }}
+                        />
+                    </div>
 
-                <div className="tlui-command-palette-content" style={{
-                    flex: 1,
-                    overflowY: 'auto',
-                    padding: '8px 0'
-                }}>
-                    {Object.keys(groupedCommands).length === 0 ? (
-                        <div className="tlui-command-palette-empty">
-                            没有找到匹配的命令
-                        </div>
-                    ) : (
-                        Object.entries(groupedCommands).map(([category, categoryCommands]) => (
-                            <div key={category} className="tlui-command-palette-group">
-                                <div className="tlui-command-palette-group-title">{category}</div>
-                                {categoryCommands.map((command, index) => {
-                                    const globalIndex = filteredCommands.indexOf(command)
-                                    return (
-                                        <div
-                                            key={command.id}
-                                            className={`tlui-command-palette-item ${globalIndex === selectedIndex ? 'tlui-command-palette-item-selected' : ''}`}
-                                            onClick={() => {
-                                                command.action()
-                                                setIsOpen(false)
-                                            }}
-                                            onMouseEnter={() => setSelectedIndex(globalIndex)}
-                                            style={{
-                                                padding: '8px 16px',
-                                                cursor: 'pointer',
-                                                borderRadius: '6px',
-                                                margin: '0 8px',
-                                                transition: 'background-color 0.1s ease',
-                                                backgroundColor: globalIndex === selectedIndex ? 'var(--color-hover)' : 'transparent'
-                                            }}
-                                        >
-                                            <div className="tlui-command-palette-item-content">
-                                                <div className="tlui-command-palette-item-main">
-                                                    <span className="tlui-command-palette-item-label">{command.label}</span>
-                                                    {command.description && (
-                                                        <span className="tlui-command-palette-item-description">{command.description}</span>
-                                                    )}
-                                                </div>
-                                                {command.kbd && (
-                                                    <div className="tlui-command-palette-item-kbd">{command.kbd}</div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )
-                                })}
+                    {/* 命令列表 */}
+                    <div style={{
+                        maxHeight: '400px',
+                        overflowY: 'auto'
+                    }}>
+                        {filteredCommands.length === 0 ? (
+                            <div style={{
+                                padding: '20px',
+                                textAlign: 'center',
+                                color: 'var(--color-text-3)',
+                                fontSize: '14px'
+                            }}>
+                                未找到匹配的命令
                             </div>
-                        ))
-                    )}
-                </div>
+                        ) : (
+                            filteredCommands.map((command, index) => (
+                                <div
+                                    key={command.id}
+                                    onClick={() => command.action()}
+                                    style={{
+                                        padding: '12px 16px',
+                                        cursor: 'pointer',
+                                        backgroundColor: index === selectedIndex ? 'var(--color-muted-2)' : 'transparent',
+                                        borderLeft: index === selectedIndex ? '3px solid var(--color-accent)' : '3px solid transparent',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between'
+                                    }}
+                                    onMouseEnter={() => setSelectedIndex(index)}
+                                >
+                                    <div>
+                                        <div style={{
+                                            fontSize: '14px',
+                                            fontWeight: '500',
+                                            color: 'var(--color-text)',
+                                            marginBottom: '2px'
+                                        }}>
+                                            {command.label}
+                                        </div>
+                                        <div style={{
+                                            fontSize: '12px',
+                                            color: 'var(--color-text-3)'
+                                        }}>
+                                            {command.description}
+                                        </div>
+                                    </div>
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px'
+                                    }}>
+                                        <span style={{
+                                            fontSize: '10px',
+                                            color: 'var(--color-text-3)',
+                                            backgroundColor: 'var(--color-muted-1)',
+                                            padding: '2px 6px',
+                                            borderRadius: '4px'
+                                        }}>
+                                            {command.category}
+                                        </span>
+                                        {command.shortcut && (
+                                            <span style={{
+                                                fontSize: '10px',
+                                                color: 'var(--color-text-3)',
+                                                fontFamily: 'monospace'
+                                            }}>
+                                                {command.shortcut}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
 
-                <div className="tlui-command-palette-footer">
-                    <span>↑↓ 导航</span>
-                    <span>Tab 下一个</span>
-                    <span>Enter 执行</span>
-                    <span>Esc 关闭</span>
-                </div>
-            </div>
-        </div>
+                    {/* 底部提示 */}
+                    <div style={{
+                        padding: '8px 16px',
+                        borderTop: '1px solid var(--color-muted-1)',
+                        fontSize: '11px',
+                        color: 'var(--color-text-3)',
+                        display: 'flex',
+                        justifyContent: 'space-between'
+                    }}>
+                        <span>↑↓ 导航 • Tab 循环 • Enter 执行</span>
+                        <span>Esc 关闭</span>
+                    </div>
+                </_Dialog.Content>
+            </_Dialog.Portal>
+        </_Dialog.Root>
     )
 } 
