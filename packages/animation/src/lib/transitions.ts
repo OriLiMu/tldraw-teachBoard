@@ -35,7 +35,7 @@ export function createEnterTransition(
             target: shapeId,
             duration: 800,
             delay: index * stagger,
-            easing: 'easeOutQuad',
+            ease: 'outQuad',
             ...config,
         }
 
@@ -110,7 +110,7 @@ export function createExitTransition(
             target: shapeId,
             duration: 600,
             delay,
-            easing: 'easeInQuad',
+            ease: 'inQuad',
             ...config,
         }
 
@@ -202,7 +202,7 @@ export function createWaveTransition(
             properties: { scale: { x: 1, y: 1 }, opacity: 1 },
             delay: distance * waveSpeed,
             duration: 800,
-            easing: 'easeOutBack',
+            ease: 'outBack',
             ...config,
         }
     })
@@ -224,7 +224,7 @@ export function createCascadeTransition(
             : { x: 0, opacity: 1 },
         delay: index * delay,
         duration: 1000,
-        easing: 'easeOutCubic',
+        ease: 'outCubic',
         ...config,
     }))
 }

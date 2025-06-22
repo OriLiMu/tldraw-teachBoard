@@ -8,9 +8,14 @@ import type { Editor } from '@tldraw/editor';
 import type { TLShapeId } from '@tldraw/tlschema';
 
 // @public (undocumented)
+export const animate: any;
+
+// @public (undocumented)
 export interface AnimationConfig {
     // (undocumented)
     autoplay?: boolean;
+    // (undocumented)
+    composition?: 'none' | 'replace' | 'blend';
     // (undocumented)
     delay?: number;
     // (undocumented)
@@ -18,9 +23,11 @@ export interface AnimationConfig {
     // (undocumented)
     duration?: number;
     // (undocumented)
-    easing?: string | ((t: number) => number);
+    ease?: string | ((t: number) => number);
     // (undocumented)
     loop?: boolean | number;
+    // (undocumented)
+    modifier?: (t: number) => number;
 }
 
 // @public (undocumented)
@@ -102,38 +109,44 @@ export const anime: any;
 
 // @public (undocumented)
 export const animeEasing: {
-    readonly linear: "linear";
-    readonly easeInQuad: "easeInQuad";
-    readonly easeOutQuad: "easeOutQuad";
-    readonly easeInOutQuad: "easeInOutQuad";
-    readonly easeInCubic: "easeInCubic";
-    readonly easeOutCubic: "easeOutCubic";
-    readonly easeInOutCubic: "easeInOutCubic";
-    readonly easeInQuart: "easeInQuart";
-    readonly easeOutQuart: "easeOutQuart";
-    readonly easeInOutQuart: "easeInOutQuart";
-    readonly easeInQuint: "easeInQuint";
-    readonly easeOutQuint: "easeOutQuint";
-    readonly easeInOutQuint: "easeInOutQuint";
-    readonly easeInSine: "easeInSine";
-    readonly easeOutSine: "easeOutSine";
-    readonly easeInOutSine: "easeInOutSine";
-    readonly easeInCirc: "easeInCirc";
-    readonly easeOutCirc: "easeOutCirc";
-    readonly easeInOutCirc: "easeInOutCirc";
-    readonly easeInExpo: "easeInExpo";
-    readonly easeOutExpo: "easeOutExpo";
-    readonly easeInOutExpo: "easeInOutExpo";
-    readonly easeInBack: "easeInBack";
-    readonly easeOutBack: "easeOutBack";
-    readonly easeInOutBack: "easeInOutBack";
-    readonly easeInElastic: "easeInElastic";
-    readonly easeOutElastic: "easeOutElastic";
-    readonly easeInOutElastic: "easeInOutElastic";
-    readonly easeInBounce: "easeInBounce";
-    readonly easeOutBounce: "easeOutBounce";
-    readonly easeInOutBounce: "easeInOutBounce";
+    readonly linear: any;
+    readonly easeInQuad: any;
+    readonly easeOutQuad: any;
+    readonly easeInOutQuad: any;
+    readonly easeInCubic: any;
+    readonly easeOutCubic: any;
+    readonly easeInOutCubic: any;
+    readonly easeInQuart: any;
+    readonly easeOutQuart: any;
+    readonly easeInOutQuart: any;
+    readonly easeInQuint: any;
+    readonly easeOutQuint: any;
+    readonly easeInOutQuint: any;
+    readonly easeInSine: any;
+    readonly easeOutSine: any;
+    readonly easeInOutSine: any;
+    readonly easeInCirc: any;
+    readonly easeOutCirc: any;
+    readonly easeInOutCirc: any;
+    readonly easeInExpo: any;
+    readonly easeOutExpo: any;
+    readonly easeInOutExpo: any;
+    readonly easeInBack: any;
+    readonly easeOutBack: any;
+    readonly easeInOutBack: any;
+    readonly easeInElastic: any;
+    readonly easeOutElastic: any;
+    readonly easeInOutElastic: any;
+    readonly easeInBounce: any;
+    readonly easeOutBounce: any;
+    readonly easeInOutBounce: any;
 };
+
+// @public (undocumented)
+export type AnimeJSAnimation = any;
+
+// @public (undocumented)
+export type AnimeTimeline = any;
 
 // @public (undocumented)
 export function bounce(target: TLShapeId | TLShapeId[], height?: number, config?: Partial<AnimationConfig>): ShapeAnimation;
@@ -142,10 +155,10 @@ export function bounce(target: TLShapeId | TLShapeId[], height?: number, config?
 export function clamp(value: number, min: number, max: number): number;
 
 // @public (undocumented)
-export function createAnimeAnimation(params: any): any;
+export function createAnimeAnimation(target: any, params: any): AnimeJSAnimation;
 
 // @public (undocumented)
-export function createAnimeTimeline(config?: any): any;
+export function createAnimeTimeline(config?: any): AnimeTimeline;
 
 // @public (undocumented)
 export function createCascadeTransition(targets: TLShapeId[], direction?: 'horizontal' | 'vertical', delay?: number, config?: Partial<AnimationConfig>): ShapeAnimation[];
@@ -184,6 +197,9 @@ export function createSequentialTransition(targets: TLShapeId[], type?: Transiti
 export function createSpiral(targets: TLShapeId[], centerX: number, centerY: number, radius?: number, config?: Partial<AnimationConfig>): ShapeAnimation[];
 
 // @public (undocumented)
+export const createTimeline: any;
+
+// @public (undocumented)
 export function createTrail(target: TLShapeId, config?: Partial<AnimationConfig & {
     length: number;
     fade: boolean;
@@ -194,6 +210,9 @@ export function createWaveTransition(targets: TLShapeId[], centerIndex?: number,
 
 // @public (undocumented)
 export function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>): T;
+
+// @public (undocumented)
+export const eases: any;
 
 // @public (undocumented)
 export const easingFunctions: {
@@ -231,7 +250,51 @@ export function generateAnimationId(): string;
 export function getAnimeEasing(easing?: string | ((t: number) => number)): string | ((t: number) => number);
 
 // @public (undocumented)
+export function getAnimeEasingFunction(easingName: string): any;
+
+// @public (undocumented)
+export function getAnimeEasingFunctions(): {
+    readonly linear: any;
+    readonly easeInQuad: any;
+    readonly easeOutQuad: any;
+    readonly easeInOutQuad: any;
+    readonly easeInCubic: any;
+    readonly easeOutCubic: any;
+    readonly easeInOutCubic: any;
+    readonly easeInQuart: any;
+    readonly easeOutQuart: any;
+    readonly easeInOutQuart: any;
+    readonly easeInQuint: any;
+    readonly easeOutQuint: any;
+    readonly easeInOutQuint: any;
+    readonly easeInSine: any;
+    readonly easeOutSine: any;
+    readonly easeInOutSine: any;
+    readonly easeInCirc: any;
+    readonly easeOutCirc: any;
+    readonly easeInOutCirc: any;
+    readonly easeInExpo: any;
+    readonly easeOutExpo: any;
+    readonly easeInOutExpo: any;
+    readonly easeInBack: any;
+    readonly easeOutBack: any;
+    readonly easeInOutBack: any;
+    readonly easeInElastic: any;
+    readonly easeOutElastic: any;
+    readonly easeInOutElastic: any;
+    readonly easeInBounce: any;
+    readonly easeOutBounce: any;
+    readonly easeInOutBounce: any;
+};
+
+// @public (undocumented)
 export function interpolate(from: number, to: number, progress: number): number;
+
+// @public (undocumented)
+export interface LegacyAnimationConfig extends AnimationConfig {
+    // (undocumented)
+    easing?: string | ((t: number) => number);
+}
 
 // @public (undocumented)
 function moveTo_2(target: TLShapeId | TLShapeId[], x: number, y: number, config?: Partial<AnimationConfig>): ShapeAnimation;

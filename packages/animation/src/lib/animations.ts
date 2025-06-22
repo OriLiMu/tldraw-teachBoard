@@ -6,7 +6,7 @@ import { generateAnimationId } from './utils'
 const DEFAULT_CONFIG: AnimationConfig = {
     duration: 1000,
     delay: 0,
-    easing: 'easeOutQuad',
+    ease: 'outQuad',
     direction: 'normal',
     loop: false,
     autoplay: true,
@@ -109,7 +109,7 @@ export function bounce(
         target,
         properties: { y: -height },
         ...DEFAULT_CONFIG,
-        easing: 'easeOutBounce',
+        ease: 'outBounce',
         direction: 'alternate',
         loop: 3,
         ...config,

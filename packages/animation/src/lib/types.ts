@@ -1,4 +1,5 @@
 import type { TLShape, TLShapeId } from '@tldraw/tlschema'
+import type { AnimeJSAnimation, AnimeTimeline } from './anime-integration'
 
 // Animation target types
 export interface AnimationTarget {
@@ -8,14 +9,22 @@ export interface AnimationTarget {
     to: any
 }
 
-// Animation configuration
+// Animation configuration for anime.js v4.0.2
 export interface AnimationConfig {
     duration?: number
     delay?: number
-    easing?: string | ((t: number) => number)
+    ease?: string | ((t: number) => number)  // v4 uses 'ease' instead of 'easing'
     direction?: 'normal' | 'reverse' | 'alternate'
     loop?: boolean | number
     autoplay?: boolean
+    // v4.0.2 specific options
+    modifier?: (t: number) => number
+    composition?: 'none' | 'replace' | 'blend'
+}
+
+// Legacy support for v3 API
+export interface LegacyAnimationConfig extends AnimationConfig {
+    easing?: string | ((t: number) => number)  // Legacy v3 property name
 }
 
 // Shape animation properties

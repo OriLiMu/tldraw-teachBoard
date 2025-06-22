@@ -8927,6 +8927,25 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@tldraw/animation@workspace:packages/animation":
+  version: 0.0.0-use.local
+  resolution: "@tldraw/animation@workspace:packages/animation"
+  dependencies:
+    "@tldraw/editor": "workspace:*"
+    "@tldraw/tlschema": "workspace:*"
+    "@tldraw/utils": "workspace:*"
+    "@types/animejs": "npm:^3.1.13"
+    "@types/react": "npm:^18.3.18"
+    animejs: "npm:4.0.2"
+    lazyrepo: "npm:0.0.0-alpha.27"
+    react: "npm:^18.3.1"
+    react-dom: "npm:^18.3.1"
+  peerDependencies:
+    react: ^18.2.0 || ^19.0.0
+    react-dom: ^18.2.0 || ^19.0.0
+  languageName: unknown
+  linkType: soft
+
 "@tldraw/assets@workspace:*, @tldraw/assets@workspace:packages/assets":
   version: 0.0.0-use.local
   resolution: "@tldraw/assets@workspace:packages/assets"
@@ -9145,6 +9164,7 @@ __metadata:
     "@sentry/cli": "npm:^2.41.1"
     "@swc/core": "npm:^1.10.11"
     "@swc/jest": "npm:^0.2.37"
+    "@types/animejs": "npm:^3.1.13"
     "@types/aws-lambda": "npm:8.10.148"
     "@types/glob": "npm:^8.1.0"
     "@types/jest": "npm:^29.5.14"
@@ -9155,6 +9175,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^8.21.0"
     "@typescript-eslint/parser": "npm:^8.21.0"
     "@yarnpkg/types": "npm:^4.0.0"
+    animejs: "npm:^4.0.2"
     auto: "npm:^11.3.0"
     cross-env: "npm:^7.0.3"
     esbuild: "npm:^0.24.2"
@@ -9506,6 +9527,13 @@ __metadata:
   dependencies:
     "@types/estree": "npm:*"
   checksum: 10/e00671d5055d06b07feccb8c2841467a4bdd1ab95a29e191d51cacc08c496e1ba1f54edeefab274bb2ba51cb45b0aaaa662a63897650e9d02e9997ad82124ae4
+  languageName: node
+  linkType: hard
+
+"@types/animejs@npm:^3.1.13":
+  version: 3.1.13
+  resolution: "@types/animejs@npm:3.1.13"
+  checksum: 10/18481e2a6c829693fe7edfc7e3f3e6f5542c6d996a405d67acf595adbcfa15ba5c930aa416fe7ba563564220931eaba4ba8f8151c8358346719b0e72d5ef5e48
   languageName: node
   linkType: hard
 
@@ -11250,6 +11278,13 @@ __metadata:
     "@algolia/requester-node-http": "npm:4.24.0"
     "@algolia/transporter": "npm:4.24.0"
   checksum: 10/fba851fb719529754b450c3d366de72289351c864aea56aa1c167ff0e36d5b015dddae7d720fe649a00d6c91d94a2091fb27789e553eb79c8d28a885585ccc6f
+  languageName: node
+  linkType: hard
+
+"animejs@npm:4.0.2, animejs@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "animejs@npm:4.0.2"
+  checksum: 10/d0b66c26b19ab5016d03b2536bab5adf5ec0f9144f1a97cc863f899c3d77cca1a84f0e6d533723c4a7e0e6a877110f9ef165ca1ec801be84131b0adeb1bec115
   languageName: node
   linkType: hard
 

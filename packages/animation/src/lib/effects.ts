@@ -62,7 +62,7 @@ export function createExplode(
             target: shapeId,
             properties: { x, y, rotation: angle },
             duration: 1000,
-            easing: 'easeOutQuad',
+            ease: 'outQuad',
             ...config,
         }
     })
@@ -81,7 +81,7 @@ export function createImplode(
         target: shapeId,
         properties: { x: centerX, y: centerY, scale: { x: 0, y: 0 } },
         duration: 800,
-        easing: 'easeInQuad',
+        ease: 'inQuad',
         ...config,
     }))
 }
@@ -126,7 +126,7 @@ export function createSpiral(
             properties: { x, y, rotation: angle },
             duration: 2000,
             delay: index * 100,
-            easing: 'easeInOutQuad',
+            ease: 'inOutQuad',
             ...config,
         }
     })
@@ -145,7 +145,7 @@ export function createMorph(
         target,
         properties: toProps,
         duration: 1500,
-        easing: 'easeInOutCubic',
+        ease: 'inOutCubic',
         ...config,
     }
 }
