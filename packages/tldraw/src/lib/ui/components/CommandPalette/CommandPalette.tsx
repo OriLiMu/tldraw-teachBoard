@@ -7,7 +7,9 @@ import { GeoShapeGeoStyle } from '@tldraw/editor'
 interface Command {
     id: string
     label: string
+    labelEn: string // 添加英文标签用于搜索
     description: string
+    descriptionEn: string // 添加英文描述用于搜索
     category: string
     shortcut?: string
     icon?: string
@@ -27,7 +29,9 @@ export function CommandPalette() {
         {
             id: 'create-rectangle',
             label: '创建矩形',
+            labelEn: 'Create Rectangle',
             description: '在画板上创建一个新的矩形形状',
+            descriptionEn: 'Create a new rectangle shape on the canvas',
             category: '形状',
             shortcut: 'R',
             icon: '▢',
@@ -40,7 +44,9 @@ export function CommandPalette() {
         {
             id: 'clear-canvas',
             label: '清空画板',
+            labelEn: 'Clear Canvas',
             description: '删除画板上的所有形状和内容',
+            descriptionEn: 'Delete all shapes and content from the canvas',
             category: '编辑',
             shortcut: 'Ctrl+A',
             icon: '✕',
@@ -55,7 +61,9 @@ export function CommandPalette() {
         {
             id: 'zoom-fit',
             label: '适应窗口',
+            labelEn: 'Zoom to Fit',
             description: '缩放画板以适应所有内容到视图中',
+            descriptionEn: 'Zoom the canvas to fit all content in the view',
             category: '视图',
             shortcut: 'Shift+1',
             icon: '⌕',
@@ -66,12 +74,19 @@ export function CommandPalette() {
         }
     ]
 
-    // 过滤命令
-    const filteredCommands = commands.filter(command =>
-        command.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        command.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        command.category.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    // 过滤命令 - 支持中英文搜索
+    const filteredCommands = commands.filter(command => {
+        const query = searchQuery.toLowerCase()
+        return (
+            // 中文搜索
+            command.label.toLowerCase().includes(query) ||
+            command.description.toLowerCase().includes(query) ||
+            command.category.toLowerCase().includes(query) ||
+            // 英文搜索
+            command.labelEn.toLowerCase().includes(query) ||
+            command.descriptionEn.toLowerCase().includes(query)
+        )
+    })
 
     // 键盘事件处理
     useEffect(() => {
@@ -129,21 +144,6 @@ export function CommandPalette() {
 
     return (
         <>
-            {/* 背景遮罩 */}
-            <div
-                className="tlui-command-palette-overlay"
-                style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.35)',
-                    zIndex: 'var(--layer-overlays)',
-                }}
-                onClick={() => setIsOpen(false)}
-            />
-
             {/* 命令面板 */}
             <div
                 className="tlui-command-palette"
