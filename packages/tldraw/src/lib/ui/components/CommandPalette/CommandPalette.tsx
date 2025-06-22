@@ -348,9 +348,11 @@ export function CommandPalette() {
                                         marginRight: '12px',
                                         fontSize: '14px', // 减小字体大小以适应70%
                                         lineHeight: 0,
-                                        maxWidth: '16px', // 减小图标宽度
+                                        width: '16px', // 固定宽度而不是maxWidth
+                                        textAlign: 'center', // 图标居中对齐
                                         fontFamily: 'system-ui, -apple-system, sans-serif', // 确保使用系统字体显示字形
-                                        fontWeight: '400'
+                                        fontWeight: '400',
+                                        flexShrink: 0 // 防止图标被压缩
                                     }}>
                                         {command.icon}
                                     </div>
