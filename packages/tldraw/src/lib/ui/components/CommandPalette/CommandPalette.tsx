@@ -17,6 +17,25 @@ interface Command {
 }
 
 // 命令面板组件
+// 高亮匹配文本的函数
+function highlightText(text: string, query: string) {
+    if (!query.trim()) return text
+
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
+    const parts = text.split(regex)
+
+    return parts.map((part, index) => {
+        if (regex.test(part)) {
+            return (
+                <span key={index} style={{ fontWeight: 'bold', color: '#000000' }}>
+                    {part}
+                </span>
+            )
+        }
+        return part
+    })
+}
+
 export function CommandPalette() {
     const editor = useEditor()
     const [isOpen, setIsOpen] = useState(false)
@@ -338,12 +357,19 @@ export function CommandPalette() {
                                 )}
 
                                 {/* 命令详情 */}
-                                <div style={{ flex: 1 }}>
+                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <div style={{
                                         fontSize: '12px',
                                         fontWeight: '500'
                                     }}>
-                                        {command.label}({command.labelEn.toLowerCase()})
+                                        {highlightText(command.label, searchQuery)}
+                                    </div>
+                                    <div style={{
+                                        fontSize: '10px',
+                                        color: '#9CA3AF',
+                                        opacity: '0.7'
+                                    }}>
+                                        {highlightText(command.labelEn.toLowerCase(), searchQuery)}
                                     </div>
                                 </div>
 
