@@ -190,7 +190,7 @@ export function CommandPalette() {
                 {/* 命令列表 */}
                 <div style={{
                     backgroundColor: '#ffffff',
-                    maxHeight: '115px', // 减小高度以适应70%大小 (约55px * 2.1)
+                    maxHeight: '80px', // 调整为适应新的行高 (约38.5px * 2.1)
                     overflowY: filteredCommands.length > 2 ? 'auto' : 'hidden',
                 }}>
                     {filteredCommands.length === 0 ? (
@@ -211,7 +211,7 @@ export function CommandPalette() {
                                 onClick={() => command.action()}
                                 onMouseEnter={() => setSelectedIndex(index)}
                                 style={{
-                                    height: '55px',
+                                    height: '38.5px', // 70% of 55px
                                     padding: '0 1rem',
                                     cursor: 'pointer',
                                     display: 'flex',
@@ -287,23 +287,23 @@ export function CommandPalette() {
                     backgroundColor: '#fafafa',
                     borderTop: '1px solid #f2f2f2',
                     padding: '0',
-                    fontSize: '14px',
+                    fontSize: '12px', // 减小字体大小以适应50%高度
                     color: '#6F768F',
                     display: 'flex',
                     alignItems: 'center',
-                    height: '40px'
+                    height: '20px' // 50% of 40px
                 }}>
                     {/* 帮助按钮 */}
                     <div style={{
                         backgroundColor: '#efefef',
                         borderBottomLeftRadius: '6px',
-                        padding: '8px 12px',
+                        padding: '4px 8px', // 减小padding以适应50%高度
                         display: 'flex',
                         alignItems: 'center',
                         height: '100%'
                     }}>
                         <svg
-                            style={{ width: '18px', opacity: 0.5 }}
+                            style={{ width: '12px', opacity: 0.5 }} // 减小图标尺寸以适应50%高度
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 512 512"
                         >
@@ -315,8 +315,8 @@ export function CommandPalette() {
                     <div style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '16px',
-                        marginLeft: '16px',
+                        gap: '12px', // 减小间距以适应50%高度
+                        marginLeft: '12px', // 减小左边距
                         flex: 1
                     }}>
                         <span style={{
@@ -325,7 +325,7 @@ export function CommandPalette() {
                             gap: '4px',
                             whiteSpace: 'nowrap'
                         }}>
-                            <svg style={{ width: '12px', marginRight: '2px' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                            <svg style={{ width: '10px', marginRight: '2px' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                 <path d="M119.7 409.6l-112-104c-10.23-9.5-10.23-25.69 0-35.19l112-104c6.984-6.484 17.17-8.219 25.92-4.406s14.41 12.45 14.41 22L159.1 264h304V56c0-13.25 10.75-24 24-24s24 10.75 24 24V288c0 13.25-10.75 24-24 24h-328l.0015 80c0 9.547-5.656 18.19-14.41 22S126.7 416.1 119.7 409.6z" />
                             </svg>
                             选择
@@ -337,7 +337,7 @@ export function CommandPalette() {
                             gap: '4px',
                             whiteSpace: 'nowrap'
                         }}>
-                            <svg style={{ width: '12px', marginRight: '2px' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512">
+                            <svg style={{ width: '10px', marginRight: '2px' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512">
                                 <path d="M254 366.4C250.2 357.7 241.5 352 232 352H152V160h80c9.547 0 18.19-5.656 21.1-14.41c3.813-8.75 2.078-18.94-4.406-25.92l-104-112C141 2.781 134.5 .3359 128 .3359s-13.05 2.445-17.59 7.336l-104 112C-.0781 126.7-1.813 136.8 1.999 145.6C5.812 154.3 14.45 160 24 160h80v192H24c-9.547 0-18.19 5.656-22 14.41s-2.078 18.94 4.406 25.92l103.1 112c4.547 4.891 11.07 7.336 17.6 7.336s13.05-2.445 17.59-7.336l104-112C256.1 385.3 257.8 375.2 254 366.4z" />
                             </svg>
                             导航
@@ -352,7 +352,7 @@ export function CommandPalette() {
                             <span style={{
                                 fontFamily: 'monospace',
                                 fontWeight: '700',
-                                fontSize: '12px'
+                                fontSize: '10px' // 减小字体大小以适应50%高度
                             }}>esc</span>
                             关闭
                         </span>
