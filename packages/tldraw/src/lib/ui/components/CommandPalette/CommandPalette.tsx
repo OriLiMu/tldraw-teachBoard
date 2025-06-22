@@ -10,6 +10,7 @@ interface Command {
     description: string
     category: string
     shortcut?: string
+    icon?: string
     action: () => void
 }
 
@@ -26,9 +27,10 @@ export function CommandPalette() {
         {
             id: 'create-rectangle',
             label: '创建矩形',
-            description: '在画板上创建一个新的矩形',
+            description: '在画板上创建一个新的矩形形状',
             category: '形状',
             shortcut: 'R',
+            icon: '⬜',
             action: () => {
                 editor.setCurrentTool('geo')
                 editor.setStyleForNextShapes(GeoShapeGeoStyle, 'rectangle')
@@ -38,9 +40,10 @@ export function CommandPalette() {
         {
             id: 'clear-canvas',
             label: '清空画板',
-            description: '删除画板上的所有形状',
+            description: '删除画板上的所有形状和内容',
             category: '编辑',
-            shortcut: 'Ctrl+A, Del',
+            shortcut: 'Ctrl+A',
+            icon: '🗑️',
             action: () => {
                 const allShapeIds = Array.from(editor.getCurrentPageShapeIds())
                 if (allShapeIds.length > 0) {
@@ -52,9 +55,10 @@ export function CommandPalette() {
         {
             id: 'zoom-fit',
             label: '适应窗口',
-            description: '缩放画板以适应所有内容',
+            description: '缩放画板以适应所有内容到视图中',
             category: '视图',
             shortcut: 'Shift+1',
+            icon: '🔍',
             action: () => {
                 editor.zoomToFit()
                 setIsOpen(false)
@@ -124,138 +128,252 @@ export function CommandPalette() {
     if (!isOpen) return null
 
     return (
-        <_Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
-            <_Dialog.Portal>
-                <_Dialog.Overlay className="tlui-dialog__overlay" />
-                <_Dialog.Content
-                    className="tlui-command-palette"
-                    style={{
-                        position: 'fixed',
-                        top: '20%',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        width: '600px',
-                        maxWidth: '90vw',
-                        backgroundColor: 'var(--color-panel)',
-                        borderRadius: 'var(--radius-3)',
-                        boxShadow: 'var(--shadow-3)',
-                        border: '1px solid var(--color-muted-1)',
-                        zIndex: 'var(--layer-overlays)',
-                    }}
-                >
-                    {/* 搜索输入框 */}
-                    <div style={{
-                        padding: '16px',
-                        borderBottom: '1px solid var(--color-muted-1)'
-                    }}>
-                        <input
-                            ref={inputRef}
-                            type="text"
-                            placeholder="输入命令或搜索..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                fontSize: '16px',
-                                border: 'none',
-                                outline: 'none',
-                                backgroundColor: 'transparent',
-                                color: 'var(--color-text)',
-                                fontFamily: 'inherit'
-                            }}
-                        />
-                    </div>
+        <>
+            {/* 背景遮罩 */}
+            <div
+                className="tlui-command-palette-overlay"
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+                    zIndex: 'var(--layer-overlays)',
+                }}
+                onClick={() => setIsOpen(false)}
+            />
 
-                    {/* 命令列表 */}
-                    <div style={{
-                        maxHeight: '400px',
-                        overflowY: 'auto'
-                    }}>
-                        {filteredCommands.length === 0 ? (
-                            <div style={{
-                                padding: '20px',
-                                textAlign: 'center',
-                                color: 'var(--color-text-3)',
-                                fontSize: '14px'
-                            }}>
-                                未找到匹配的命令
-                            </div>
-                        ) : (
-                            filteredCommands.map((command, index) => (
-                                <div
-                                    key={command.id}
-                                    onClick={() => command.action()}
-                                    style={{
-                                        padding: '12px 16px',
-                                        cursor: 'pointer',
-                                        backgroundColor: index === selectedIndex ? 'var(--color-muted-2)' : 'transparent',
-                                        borderLeft: index === selectedIndex ? '3px solid var(--color-accent)' : '3px solid transparent',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between'
-                                    }}
-                                    onMouseEnter={() => setSelectedIndex(index)}
-                                >
-                                    <div>
-                                        <div style={{
-                                            fontSize: '14px',
-                                            fontWeight: '500',
-                                            color: 'var(--color-text)',
-                                            marginBottom: '2px'
-                                        }}>
-                                            {command.label}
-                                        </div>
-                                        <div style={{
-                                            fontSize: '12px',
-                                            color: 'var(--color-text-3)'
-                                        }}>
-                                            {command.description}
-                                        </div>
-                                    </div>
+            {/* 命令面板 */}
+            <div
+                className="tlui-command-palette"
+                style={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '600px',
+                    maxWidth: '90vw',
+                    borderRadius: '6px',
+                    boxShadow: '0px 4px 6px 2px rgba(0, 0, 0, 0.1)',
+                    zIndex: 'var(--layer-overlays)',
+                    animation: 'tlui-command-palette-appear 300ms ease-out',
+                    overflow: 'hidden',
+                }}
+            >
+                {/* 搜索输入框 */}
+                <div style={{
+                    backgroundColor: '#2D2D37',
+                    padding: 0,
+                }}>
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        placeholder="输入命令..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        style={{
+                            width: '100%',
+                            height: '55px',
+                            padding: '0 1rem',
+                            fontSize: '16px',
+                            border: 'none',
+                            outline: 'none',
+                            backgroundColor: 'transparent',
+                            color: '#ffffff',
+                            fontFamily: 'inherit'
+                        }}
+                    />
+                </div>
+
+                {/* 命令列表 */}
+                <div style={{
+                    backgroundColor: '#ffffff',
+                    maxHeight: '165px', // 55px * 3 commands
+                    overflowY: filteredCommands.length > 3 ? 'auto' : 'hidden',
+                }}>
+                    {filteredCommands.length === 0 ? (
+                        <div style={{
+                            padding: '20px',
+                            textAlign: 'center',
+                            color: '#6F768F',
+                            fontSize: '14px',
+                            fontVariant: 'all-small-caps',
+                            letterSpacing: '-0.015em'
+                        }}>
+                            未找到结果
+                        </div>
+                    ) : (
+                        filteredCommands.map((command, index) => (
+                            <div
+                                key={command.id}
+                                onClick={() => command.action()}
+                                onMouseEnter={() => setSelectedIndex(index)}
+                                style={{
+                                    height: '55px',
+                                    padding: '0 1rem',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    backgroundColor: index === selectedIndex ? '#ECF3FD' : 'transparent',
+                                    color: index === selectedIndex ? '#2D2D37' : '#4E5061',
+                                    transition: 'all 150ms ease-in-out',
+                                }}
+                            >
+                                {/* 图标 */}
+                                {command.icon && (
                                     <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '8px'
+                                        marginRight: '12px',
+                                        fontSize: '16px',
+                                        lineHeight: 0,
+                                        maxWidth: '18px'
                                     }}>
-                                        <span style={{
-                                            fontSize: '10px',
-                                            color: 'var(--color-text-3)',
-                                            backgroundColor: 'var(--color-muted-1)',
-                                            padding: '2px 6px',
-                                            borderRadius: '4px'
-                                        }}>
-                                            {command.category}
-                                        </span>
-                                        {command.shortcut && (
-                                            <span style={{
-                                                fontSize: '10px',
-                                                color: 'var(--color-text-3)',
-                                                fontFamily: 'monospace'
-                                            }}>
-                                                {command.shortcut}
-                                            </span>
-                                        )}
+                                        {command.icon}
+                                    </div>
+                                )}
+
+                                {/* 命令详情 */}
+                                <div style={{ flex: 1 }}>
+                                    <div style={{
+                                        fontSize: '14px',
+                                        fontWeight: '500',
+                                        marginBottom: '2px'
+                                    }}>
+                                        {command.label}
+                                    </div>
+                                    {/* 悬停时显示描述 */}
+                                    <div style={{
+                                        fontSize: '12px',
+                                        color: '#6F768F',
+                                        height: index === selectedIndex ? 'auto' : '0',
+                                        opacity: index === selectedIndex ? 1 : 0,
+                                        transform: index === selectedIndex ? 'translateY(0)' : 'translateY(-5px)',
+                                        transition: 'transform 150ms, opacity 75ms',
+                                        overflow: 'hidden'
+                                    }}>
+                                        {command.description}
                                     </div>
                                 </div>
-                            ))
-                        )}
+
+                                {/* 快捷键 */}
+                                <div style={{ textAlign: 'right' }}>
+                                    {command.shortcut && (
+                                        <span style={{
+                                            fontSize: '12px',
+                                            color: '#6F768F',
+                                            backgroundColor: '#efefef',
+                                            border: '1px solid #d1d5dc',
+                                            borderRadius: '3px',
+                                            padding: '2px 6px',
+                                            fontFamily: 'monospace',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            height: '15px'
+                                        }}>
+                                            {command.shortcut}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+
+                {/* 底部帮助栏 */}
+                <div style={{
+                    backgroundColor: '#fafafa',
+                    borderTop: '1px solid #f2f2f2',
+                    padding: '0',
+                    fontSize: '14px',
+                    color: '#6F768F',
+                    display: 'flex',
+                    alignItems: 'center',
+                    height: '40px'
+                }}>
+                    {/* 帮助按钮 */}
+                    <div style={{
+                        backgroundColor: '#efefef',
+                        borderBottomLeftRadius: '6px',
+                        padding: '8px 12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        height: '100%'
+                    }}>
+                        <svg
+                            style={{ width: '18px', opacity: 0.5 }}
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 512 512"
+                        >
+                            <path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM256 464c-114.7 0-208-93.31-208-208S141.3 48 256 48s208 93.31 208 208S370.7 464 256 464zM256 336c-18 0-32 14-32 32s13.1 32 32 32c17.1 0 32-14 32-32S273.1 336 256 336zM289.1 128h-51.1C199 128 168 159 168 198c0 13 11 24 24 24s24-11 24-24C216 186 225.1 176 237.1 176h51.1C301.1 176 312 186 312 198c0 8-4 14.1-11 18.1L244 251C236 256 232 264 232 272V288c0 13 11 24 24 24S280 301 280 288V286l45.1-28c21-13 34-36 34-60C360 159 329 128 289.1 128z" />
+                        </svg>
                     </div>
 
-                    {/* 底部提示 */}
+                    {/* 快捷键提示 */}
                     <div style={{
-                        padding: '8px 16px',
-                        borderTop: '1px solid var(--color-muted-1)',
-                        fontSize: '11px',
-                        color: 'var(--color-text-3)',
                         display: 'flex',
-                        justifyContent: 'space-between'
+                        alignItems: 'center',
+                        gap: '16px',
+                        marginLeft: '16px',
+                        flex: 1
                     }}>
-                        <span>↑↓ 导航 • Tab 循环 • Enter 执行</span>
-                        <span>Esc 关闭</span>
+                        <span style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            whiteSpace: 'nowrap'
+                        }}>
+                            <svg style={{ width: '12px', marginRight: '2px' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                <path d="M119.7 409.6l-112-104c-10.23-9.5-10.23-25.69 0-35.19l112-104c6.984-6.484 17.17-8.219 25.92-4.406s14.41 12.45 14.41 22L159.1 264h304V56c0-13.25 10.75-24 24-24s24 10.75 24 24V288c0 13.25-10.75 24-24 24h-328l.0015 80c0 9.547-5.656 18.19-14.41 22S126.7 416.1 119.7 409.6z" />
+                            </svg>
+                            选择
+                        </span>
+
+                        <span style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            whiteSpace: 'nowrap'
+                        }}>
+                            <svg style={{ width: '12px', marginRight: '2px' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512">
+                                <path d="M254 366.4C250.2 357.7 241.5 352 232 352H152V160h80c9.547 0 18.19-5.656 21.1-14.41c3.813-8.75 2.078-18.94-4.406-25.92l-104-112C141 2.781 134.5 .3359 128 .3359s-13.05 2.445-17.59 7.336l-104 112C-.0781 126.7-1.813 136.8 1.999 145.6C5.812 154.3 14.45 160 24 160h80v192H24c-9.547 0-18.19 5.656-22 14.41s-2.078 18.94 4.406 25.92l103.1 112c4.547 4.891 11.07 7.336 17.6 7.336s13.05-2.445 17.59-7.336l104-112C256.1 385.3 257.8 375.2 254 366.4z" />
+                            </svg>
+                            导航
+                        </span>
+
+                        <span style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            whiteSpace: 'nowrap'
+                        }}>
+                            <span style={{
+                                fontFamily: 'monospace',
+                                fontWeight: '700',
+                                fontSize: '12px'
+                            }}>esc</span>
+                            关闭
+                        </span>
                     </div>
-                </_Dialog.Content>
-            </_Dialog.Portal>
-        </_Dialog.Root>
+                </div>
+            </div>
+
+            {/* 添加CSS动画 */}
+            <style>{`
+				@keyframes tlui-command-palette-appear {
+					0% {
+						opacity: 0;
+						transform: translate(-50%, -50%) scale(1, 1);
+					}
+					50% {
+						opacity: 1;
+						transform: translate(-50%, -50%) scale(1.05, 1.05);
+					}
+					100% {
+						opacity: 1;
+						transform: translate(-50%, -50%) scale(1, 1);
+					}
+				}
+			`}</style>
+        </>
     )
 } 
